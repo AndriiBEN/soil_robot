@@ -56,8 +56,8 @@ button{font-family:inherit;}
 
 /* ---------- NAVBAR ---------- */
 .navbar{
-  position:sticky; top:0; z-index:100;
-  background:rgba(247,247,242,0.86);
+  position:fixed; top:0; left:0; right:0; z-index:500;
+  background:rgba(247,247,242,0.92);
   backdrop-filter:blur(10px);
   border-bottom:1px solid transparent;
   transition:border-color .25s ease, box-shadow .25s ease;
@@ -226,7 +226,7 @@ section{padding:108px 0;}
 @media (max-width:880px){.steps-row{grid-template-columns:1fr; gap:34px;} .step{border-left:none; padding-left:0; border-top:1px solid rgba(255,255,255,0.14); padding-top:24px;} .step:first-child{border-top:none; padding-top:0;} .steps-band{padding:48px 26px;}}
 
 /* ---------- ADVANTAGES ---------- */
-.adv-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
+.adv-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
 .adv-card{
   background:var(--bg-card-alt); border:1px solid var(--border); border-radius:var(--radius-lg); padding:30px 24px;
   text-align:left;
@@ -576,6 +576,19 @@ footer{padding:60px 0 40px;}
 .cart-total-row{display:flex; justify-content:space-between; align-items:center; font-weight:800; margin-bottom:14px; font-size:1rem;}
 .cart-total-row b{font-family:'JetBrains Mono',monospace; color:var(--primary);}
 .fav-add-btn{background:none; border:1px solid var(--border); border-radius:8px; padding:6px 10px; font-size:0.76rem; font-weight:700; cursor:pointer; color:var(--primary); white-space:nowrap;}
+
+/* ---------- STORE PAGE MODE (Каталог / Добрива opened as a separate page) ---------- */
+.page-back-btn{
+  position:fixed; z-index:400; left:22px;
+  display:flex; align-items:center; gap:8px;
+  background:#fff; border:1px solid var(--border); border-radius:999px;
+  padding:10px 18px 10px 14px; font-weight:700; font-size:0.88rem; color:var(--primary);
+  cursor:pointer; box-shadow:var(--shadow-card);
+}
+.page-back-btn:hover{background:var(--bg-card-alt);}
+.page-back-btn svg{width:16px; height:16px;}
+body.page-mode section, body.page-mode footer{ animation:pageFadeIn .25s ease; }
+@keyframes pageFadeIn{ from{opacity:0;} to{opacity:1;} }
 </style>
 </head>
 <body>
@@ -643,6 +656,11 @@ footer{padding:60px 0 40px;}
   </ul>
 </div>
 
+<button type="button" id="pageBackBtn" class="page-back-btn" style="display:none;">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+  <span data-i18n="nav.back">На головну</span>
+</button>
+
 <!-- HERO -->
 <section class="hero" id="about">
   <div class="hero-field"></div>
@@ -650,17 +668,17 @@ footer{padding:60px 0 40px;}
   <div class="hero-inner wrap">
     <div class="hero-grid">
       <div>
-        <div class="hero-eyebrow"><span class="dot"></span> Точне землеробство нового покоління</div>
-        <h1>Автономний робот<br>для моніторингу<br>якості ґрунту</h1>
-        <p class="lead">Інноваційне рішення для точного землеробства. Наш робот автоматично збирає фізико-хімічні параметри ґрунту та передає дані для аналізу в реальному часі.</p>
+        <div class="hero-eyebrow"><span class="dot"></span> <span data-i18n="hero.eyebrow">Точне землеробство нового покоління</span></div>
+        <h1 data-i18n="hero.title">Автономний робот для моніторингу якості ґрунту</h1>
+        <p class="lead" data-i18n="hero.lead">Інноваційне рішення для точного землеробства. Наш робот автоматично збирає фізико-хімічні параметри ґрунту та передає дані для аналізу в реальному часі.</p>
         <div class="hero-actions">
-          <a href="#tech" class="btn btn-primary">Дізнатись більше →</a>
-          <button class="btn btn-ghost" id="heroAccountBtn">Увійти в акаунт</button>
+          <a href="#tech" class="btn btn-primary" data-i18n="hero.cta_more">Дізнатись більше →</a>
+          <button class="btn btn-ghost" id="heroAccountBtn" data-i18n="nav.account">Увійти в акаунт</button>
         </div>
         <div class="hero-stats">
-          <div class="hero-stat"><b>5+</b><span>Типів сенсорів</span></div>
-          <div class="hero-stat"><b>24/7</b><span>Моніторинг</span></div>
-          <div class="hero-stat"><b>GPS</b><span>Точність</span></div>
+          <div class="hero-stat"><b>5+</b><span data-i18n="hero.stat_sensors">Типів сенсорів</span></div>
+          <div class="hero-stat"><b>24/7</b><span data-i18n="hero.stat_monitoring">Моніторинг</span></div>
+          <div class="hero-stat"><b>GPS</b><span data-i18n="hero.stat_accuracy">Точність</span></div>
         </div>
       </div>
       <div class="hero-robot">
@@ -697,35 +715,35 @@ footer{padding:60px 0 40px;}
 <section id="tech">
   <div class="wrap">
     <div class="section-head center reveal">
-      <p class="eyebrow-tag">Сенсорна система</p>
-      <h2>Комплексний аналіз ґрунту</h2>
-      <p>Наш робот оснащений передовими сенсорами для вимірювання ключових фізико-хімічних параметрів ґрунту</p>
+      <p class="eyebrow-tag" data-i18n="tech.eyebrow">Сенсорна система</p>
+      <h2 data-i18n="tech.title">Комплексний аналіз ґрунту</h2>
+      <p data-i18n="tech.subtitle">Наш робот оснащений передовими сенсорами для вимірювання ключових фізико-хімічних параметрів ґрунту</p>
     </div>
     <div class="sensor-grid">
       <div class="sensor-card reveal">
         <div class="sensor-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2c3 5 7 9 7 13a7 7 0 1 1-14 0c0-4 4-8 7-13z"/></svg></div>
-        <h3>Вологість</h3>
-        <p>Точне вимірювання вмісту вологи у ґрунті на різних глибинах</p>
+        <h3 data-i18n="sensor.moisture.name">Вологість</h3>
+        <p data-i18n="sensor.moisture.desc">Точне вимірювання вмісту вологи у ґрунті на різних глибинах</p>
       </div>
       <div class="sensor-card reveal">
         <div class="sensor-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg></div>
-        <h3>Температура</h3>
-        <p>Моніторинг температури ґрунту для оптимального росту рослин</p>
+        <h3 data-i18n="sensor.temp.name">Температура</h3>
+        <p data-i18n="sensor.temp.desc">Моніторинг температури ґрунту для оптимального росту рослин</p>
       </div>
       <div class="sensor-card reveal">
         <div class="sensor-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3h6l1 4-4 3-4-3 1-4z"/><path d="M6 21c0-4 2.5-6 6-6s6 2 6 6"/></svg></div>
-        <h3>Кислотність (pH)</h3>
-        <p>Аналіз рівня pH для визначення придатності ґрунту</p>
+        <h3 data-i18n="sensor.ph.name">Кислотність (pH)</h3>
+        <p data-i18n="sensor.ph.desc">Аналіз рівня pH для визначення придатності ґрунту</p>
       </div>
       <div class="sensor-card reveal">
         <div class="sensor-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h4l2-7 4 14 2-7h4"/></svg></div>
-        <h3>Електропровідність</h3>
-        <p>Вимірювання EC для оцінки вмісту солей та мінералів</p>
+        <h3 data-i18n="sensor.ec.name">Електропровідність</h3>
+        <p data-i18n="sensor.ec.desc">Вимірювання EC для оцінки вмісту солей та мінералів</p>
       </div>
       <div class="sensor-card reveal">
         <div class="sensor-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
-        <h3>NPK Елементи</h3>
-        <p>Визначення вмісту азоту, фосфору та калію в ґрунті</p>
+        <h3 data-i18n="sensor.npk.name">NPK Елементи</h3>
+        <p data-i18n="sensor.npk.desc">Визначення вмісту азоту, фосфору та калію в ґрунті</p>
       </div>
     </div>
   </div>
@@ -735,16 +753,16 @@ footer{padding:60px 0 40px;}
 <section id="how">
   <div class="wrap">
     <div class="section-head center reveal">
-      <p class="eyebrow-tag">Процес</p>
-      <h2>Як це працює</h2>
+      <p class="eyebrow-tag" data-i18n="how.eyebrow">Процес</p>
+      <h2 data-i18n="how.title">Як це працює</h2>
     </div>
     <div class="steps-band reveal" id="stepsBand">
       <div class="steps-track"><div class="steps-track-fill" id="stepsFill"></div></div>
       <div class="steps-row">
-        <div class="step"><span class="step-num">01</span><h3>Автономна навігація</h3><p>Робот самостійно переміщується полем за допомогою GPS та датчиків навігації</p></div>
-        <div class="step"><span class="step-num">02</span><h3>Збір даних</h3><p>Сенсори занурюються в ґрунт та вимірюють всі ключові параметри</p></div>
-        <div class="step"><span class="step-num">03</span><h3>Передача у хмару</h3><p>Дані миттєво передаються до інформаційної системи через бездротовий зв'язок</p></div>
-        <div class="step"><span class="step-num">04</span><h3>Аналіз та рекомендації</h3><p>Система аналізує дані та формує персоналізовані рекомендації для агронома</p></div>
+        <div class="step"><span class="step-num">01</span><h3 data-i18n="how.step1.title">Автономна навігація</h3><p data-i18n="how.step1.desc">Робот самостійно переміщується полем за допомогою GPS та датчиків навігації</p></div>
+        <div class="step"><span class="step-num">02</span><h3 data-i18n="how.step2.title">Збір даних</h3><p data-i18n="how.step2.desc">Сенсори занурюються в ґрунт та вимірюють всі ключові параметри</p></div>
+        <div class="step"><span class="step-num">03</span><h3 data-i18n="how.step3.title">Передача у хмару</h3><p data-i18n="how.step3.desc">Дані миттєво передаються до інформаційної системи через бездротовий зв'язок</p></div>
+        <div class="step"><span class="step-num">04</span><h3 data-i18n="how.step4.title">Аналіз та рекомендації</h3><p data-i18n="how.step4.desc">Система аналізує дані та формує персоналізовані рекомендації для агронома</p></div>
       </div>
     </div>
   </div>
@@ -754,15 +772,14 @@ footer{padding:60px 0 40px;}
 <section id="features">
   <div class="wrap">
     <div class="section-head center reveal">
-      <p class="eyebrow-tag">Переваги</p>
-      <h2>Чому обрати наше рішення</h2>
-      <p>Інтелектуальний моніторинг ґрунту для сучасного аграрного бізнесу</p>
+      <p class="eyebrow-tag" data-i18n="features.eyebrow">Переваги</p>
+      <h2 data-i18n="features.title">Чому обрати наше рішення</h2>
+      <p data-i18n="features.subtitle">Інтелектуальний моніторинг ґрунту для сучасного аграрного бізнесу</p>
     </div>
     <div class="adv-grid">
-      <div class="adv-card reveal"><span class="adv-num">+30%</span><h3>Підвищення врожайності</h3><span class="adv-note">Заявлена ціль на основі пілотних господарств</span></div>
-      <div class="adv-card reveal"><span class="adv-num">10x</span><h3>Економія часу</h3><span class="adv-note">Порівняно з ручним відбором проб</span></div>
-      <div class="adv-card reveal"><span class="adv-num">GPS</span><h3>Точне землеробство</h3><span class="adv-note">Прив'язка кожної проби до координат</span></div>
-      <div class="adv-card reveal"><span class="adv-num">ECO</span><h3>Збереження довкілля</h3><span class="adv-note">Менше надлишкового внесення добрив</span></div>
+      <div class="adv-card reveal"><span class="adv-num">10x</span><h3 data-i18n="features.time.title">Економія часу</h3><span class="adv-note" data-i18n="features.time.note">Порівняно з ручним відбором проб</span></div>
+      <div class="adv-card reveal"><span class="adv-num">GPS</span><h3 data-i18n="features.precision.title">Точне землеробство</h3><span class="adv-note" data-i18n="features.precision.note">Прив'язка кожної проби до координат</span></div>
+      <div class="adv-card reveal"><span class="adv-num">ECO</span><h3 data-i18n="features.eco.title">Збереження довкілля</h3><span class="adv-note" data-i18n="features.eco.note">Менше надлишкового внесення добрив</span></div>
     </div>
   </div>
 </section>
@@ -771,24 +788,24 @@ footer{padding:60px 0 40px;}
 <section class="field-section" id="field">
   <div class="wrap">
     <div class="section-head center reveal">
-      <p class="eyebrow-tag">Моніторинг поля</p>
-      <h2>Моніторинг вашого поля</h2>
-      <p>Карта поля, стан робота та ключові показники ґрунту — в одному місці, оновлюється в реальному часі</p>
+      <p class="eyebrow-tag" data-i18n="field.eyebrow">Моніторинг поля</p>
+      <h2 data-i18n="field.title">Моніторинг вашого поля</h2>
+      <p data-i18n="field.subtitle">Карта поля, стан робота та ключові показники ґрунту — в одному місці, оновлюється в реальному часі</p>
     </div>
     <div class="flow-diagram reveal">
-      <div class="flow-node">Поле</div><div class="flow-arrow">→</div>
-      <div class="flow-node">Робот</div><div class="flow-arrow">→</div>
-      <div class="flow-node">Сенсори</div><div class="flow-arrow">→</div>
-      <div class="flow-node">Аналіз</div><div class="flow-arrow">→</div>
-      <div class="flow-node">Рекомендація</div>
+      <div class="flow-node" data-i18n="field.flow.field">Поле</div><div class="flow-arrow">→</div>
+      <div class="flow-node" data-i18n="field.flow.robot">Робот</div><div class="flow-arrow">→</div>
+      <div class="flow-node" data-i18n="field.flow.sensors">Сенсори</div><div class="flow-arrow">→</div>
+      <div class="flow-node" data-i18n="field.flow.analysis">Аналіз</div><div class="flow-arrow">→</div>
+      <div class="flow-node" data-i18n="field.flow.reco">Рекомендація</div>
     </div>
     <div class="field-map-card reveal">
       <div class="field-map-head">
-        <h4>Карта поля №1 · 76 га</h4>
+        <h4 data-i18n="field.map_title">Карта поля №1 · 76 га</h4>
         <div class="legend">
-          <span><i style="background:#2CA58D"></i>Норма</span>
-          <span><i style="background:#E8B84B"></i>Увага</span>
-          <span><i style="background:#C7654B"></i>Дефіцит</span>
+          <span><i style="background:#2CA58D"></i><span data-i18n="field.legend.ok">Норма</span></span>
+          <span><i style="background:#E8B84B"></i><span data-i18n="field.legend.mid">Увага</span></span>
+          <span><i style="background:#C7654B"></i><span data-i18n="field.legend.low">Дефіцит</span></span>
         </div>
       </div>
       <div style="position:relative;">
@@ -796,22 +813,22 @@ footer{padding:60px 0 40px;}
         <svg id="routeOverlay" class="route-overlay" viewBox="0 0 10 6" preserveAspectRatio="none"></svg>
         <div class="field-tooltip" id="fieldTooltip"></div>
       </div>
-      <p class="field-note">Наведіть курсор на точку відбору проби, щоб побачити виміряні параметри. Білі крапки — точки, де робот здійснив вимірювання; пунктирна лінія показує маршрут робота.</p>
+      <p class="field-note" data-i18n="field.note">Наведіть курсор на точку відбору проби, щоб побачити виміряні параметри. Білі крапки — точки, де робот здійснив вимірювання; пунктирна лінія показує маршрут робота.</p>
 
       <div class="field-stats-split">
         <div class="stats-col">
-          <h5>Поле №1 · 76 га</h5>
-          <div class="stat-row"><span>Вологість</span><b class="ok">68%</b></div>
-          <div class="stat-row"><span>pH</span><b class="ok">6.4</b></div>
-          <div class="stat-row"><span>Азот (N)</span><b class="mid">82 mg/kg</b></div>
-          <div class="stat-row"><span>Фосфор (P)</span><b class="low">38 mg/kg</b></div>
-          <div class="stat-row"><span>Калій (K)</span><b class="ok">145 mg/kg</b></div>
+          <h5 data-i18n="field.stats_title">Поле №1 · 76 га</h5>
+          <div class="stat-row"><span data-i18n="field.moisture">Вологість</span><b class="ok">68%</b></div>
+          <div class="stat-row"><span data-i18n="field.ph">pH</span><b class="ok">6.4</b></div>
+          <div class="stat-row"><span data-i18n="field.n">Азот (N)</span><b class="mid">82 mg/kg</b></div>
+          <div class="stat-row"><span data-i18n="field.p">Фосфор (P)</span><b class="low">38 mg/kg</b></div>
+          <div class="stat-row"><span data-i18n="field.k">Калій (K)</span><b class="ok">145 mg/kg</b></div>
         </div>
         <div class="stats-col">
-          <h5>Статус</h5>
-          <div class="robot-online-pill"><i></i>Робот онлайн</div>
+          <h5 data-i18n="field.status_title">Статус</h5>
+          <div class="robot-online-pill"><i></i><span data-i18n="field.robot_online">Робот онлайн</span></div>
           <div class="progress-track" style="margin-top:18px;"><div class="progress-fill" style="width:78%"></div></div>
-          <div class="stat-row" style="border:none;"><span>Загальний індекс ґрунту</span><b class="ok">78%</b></div>
+          <div class="stat-row" style="border:none;"><span data-i18n="field.soil_index">Загальний індекс ґрунту</span><b class="ok">78%</b></div>
           <div class="mini-tiles">
             <div class="mini-tile mid">N<span>82</span></div>
             <div class="mini-tile low">P<span>38</span></div>
@@ -841,7 +858,7 @@ footer{padding:60px 0 40px;}
           <div class="robot-metric"><b>2 <span data-i18n="robot.hours_short">год</span></b><span data-i18n="robot.uptime">Час роботи</span></div>
         </div>
         <div class="robot-actions">
-          <button class="btn btn-primary" id="connectBtn" data-i18n="robot.connect">Підключитись</button>
+          <button class="btn btn-primary" id="connectBtn">Підключитись</button>
           <a href="#field" class="btn btn-ghost" style="color:var(--primary); background:rgba(23,59,44,0.08); border-color:rgba(23,59,44,0.2);" data-i18n="robot.to_map">На карту</a>
           <button class="btn btn-ghost" id="robotDetailsBtn" data-i18n="robot.details">Деталі</button>
         </div>
@@ -865,78 +882,78 @@ footer{padding:60px 0 40px;}
 <section id="analysis">
   <div class="wrap">
     <div class="section-head center reveal">
-      <p class="eyebrow-tag">Аналіз ґрунту</p>
-      <h2>Проаналізуйте показники вашого поля</h2>
-      <p>Введіть дані з робота або лабораторного аналізу — результат з'явиться одразу на сторінці, без перезавантаження</p>
+      <p class="eyebrow-tag" data-i18n="analysis.eyebrow">Аналіз ґрунту</p>
+      <h2 data-i18n="analysis.title">Проаналізуйте показники вашого поля</h2>
+      <p data-i18n="analysis.subtitle">Введіть дані з робота або лабораторного аналізу — результат з'явиться одразу на сторінці, без перезавантаження</p>
     </div>
     <div class="fert-layout">
       <div class="calc-card reveal">
         <form id="soilForm" novalidate>
           <div class="form-grid">
             <div class="field">
-              <label for="crop">Культура</label>
+              <label for="crop" data-i18n="analysis.label_crop">Культура</label>
               <select id="crop">
-                <option value="Пшениця">Пшениця</option>
-                <option value="Кукурудза">Кукурудза</option>
-                <option value="Соняшник">Соняшник</option>
-                <option value="Ріпак">Ріпак</option>
-                <option value="Соя">Соя</option>
+                <option value="Пшениця" data-i18n="crop.wheat">Пшениця</option>
+                <option value="Кукурудза" data-i18n="crop.corn">Кукурудза</option>
+                <option value="Соняшник" data-i18n="crop.sunflower">Соняшник</option>
+                <option value="Ріпак" data-i18n="crop.canola">Ріпак</option>
+                <option value="Соя" data-i18n="crop.soy">Соя</option>
               </select>
             </div>
             <div class="field">
-              <label for="soilType">Тип ґрунту</label>
+              <label for="soilType" data-i18n="analysis.label_soil">Тип ґрунту</label>
               <select id="soilType">
-                <option>Чорнозем</option>
-                <option>Суглинок</option>
-                <option>Супісок</option>
-                <option>Глина</option>
-                <option>Піщаний</option>
+                <option value="Чорнозем" data-i18n="soil.chornozem">Чорнозем</option>
+                <option value="Суглинок" data-i18n="soil.loam">Суглинок</option>
+                <option value="Супісок" data-i18n="soil.sandyloam">Супісок</option>
+                <option value="Глина" data-i18n="soil.clay">Глина</option>
+                <option value="Піщаний" data-i18n="soil.sandy">Піщаний</option>
               </select>
             </div>
             <div class="field" id="areaField">
-              <label for="area">Площа поля, га</label>
+              <label for="area" data-i18n="analysis.label_area">Площа поля, га</label>
               <input type="number" id="area" min="0.1" step="0.1" placeholder="76">
-              <span class="err">Вкажіть площу більшу за 0</span>
+              <span class="err" data-i18n="analysis.err_area">Вкажіть площу більшу за 0</span>
             </div>
             <div class="field" id="phField">
-              <label for="ph">pH ґрунту</label>
+              <label for="ph" data-i18n="analysis.label_ph">pH ґрунту</label>
               <input type="number" id="ph" min="3" max="10" step="0.1" placeholder="6.4">
-              <span class="err">pH має бути в діапазоні 3–10</span>
+              <span class="err" data-i18n="analysis.err_ph">pH має бути в діапазоні 3–10</span>
             </div>
             <div class="field" id="nField">
-              <label for="nitrogen">Азот (N), mg/kg</label>
+              <label for="nitrogen" data-i18n="analysis.label_n">Азот (N), mg/kg</label>
               <input type="number" id="nitrogen" min="0" step="1" placeholder="82">
-              <span class="err">Вкажіть значення від 0 і вище</span>
+              <span class="err" data-i18n="analysis.err_n">Вкажіть значення від 0 і вище</span>
             </div>
             <div class="field" id="pField">
-              <label for="phosphorus">Фосфор (P), mg/kg</label>
+              <label for="phosphorus" data-i18n="analysis.label_p">Фосфор (P), mg/kg</label>
               <input type="number" id="phosphorus" min="0" step="1" placeholder="38">
-              <span class="err">Вкажіть значення від 0 і вище</span>
+              <span class="err" data-i18n="analysis.err_p">Вкажіть значення від 0 і вище</span>
             </div>
             <div class="field" id="kField">
-              <label for="potassium">Калій (K), mg/kg</label>
+              <label for="potassium" data-i18n="analysis.label_k">Калій (K), mg/kg</label>
               <input type="number" id="potassium" min="0" step="1" placeholder="145">
-              <span class="err">Вкажіть значення від 0 і вище</span>
+              <span class="err" data-i18n="analysis.err_k">Вкажіть значення від 0 і вище</span>
             </div>
             <div class="field" id="moistureField">
-              <label for="moisture">Вологість, %</label>
+              <label for="moisture" data-i18n="analysis.label_moisture">Вологість, %</label>
               <input type="number" id="moisture" min="0" max="100" step="1" placeholder="68">
-              <span class="err">Вкажіть значення від 0 до 100</span>
+              <span class="err" data-i18n="analysis.err_moisture">Вкажіть значення від 0 до 100</span>
             </div>
             <div class="field full" id="temperatureField">
-              <label for="temperature">Температура ґрунту, °C</label>
+              <label for="temperature" data-i18n="analysis.label_temp">Температура ґрунту, °C</label>
               <input type="number" id="temperature" min="-10" max="45" step="1" placeholder="17">
-              <span class="err">Вкажіть значення від -10 до 45</span>
+              <span class="err" data-i18n="analysis.err_temp">Вкажіть значення від -10 до 45</span>
             </div>
           </div>
-          <button type="submit" class="btn btn-dark calc-submit" id="analyzeBtn">Проаналізувати ґрунт</button>
+          <button type="submit" class="btn btn-dark calc-submit" id="analyzeBtn" data-i18n="analysis.submit">Проаналізувати ґрунт</button>
         </form>
       </div>
 
       <div class="result-card reveal" id="resultCard">
         <div class="result-empty" id="resultEmpty">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v5l3 2"/></svg>
-          <p>Заповніть форму зліва та натисніть «Проаналізувати ґрунт», щоб побачити результат аналізу.</p>
+          <p data-i18n="analysis.empty_hint">Заповніть форму зліва та натисніть «Проаналізувати ґрунт», щоб побачити результат аналізу.</p>
         </div>
         <div id="resultBody" style="display:none;"></div>
       </div>
@@ -970,29 +987,29 @@ footer{padding:60px 0 40px;}
 <section id="charts">
   <div class="wrap">
     <div class="section-head center reveal">
-      <p class="eyebrow-tag">Динаміка</p>
-      <h2>Показники в динаміці</h2>
-      <p>Демонстраційні дані з робота за тиждень та по точках відбору проб</p>
+      <p class="eyebrow-tag" data-i18n="charts.eyebrow">Динаміка</p>
+      <h2 data-i18n="charts.title">Показники в динаміці</h2>
+      <p data-i18n="charts.subtitle">Демонстраційні дані з робота за тиждень та по точках відбору проб</p>
     </div>
     <div class="charts-grid reveal">
       <div class="chart-card">
-        <h4>Вологість ґрунту за 7 днів</h4>
-        <p class="sub">%, дані з робота, поле №1</p>
+        <h4 data-i18n="charts.moisture_title">Вологість ґрунту за 7 днів</h4>
+        <p class="sub" data-i18n="charts.moisture_sub">%, дані з робота, поле №1</p>
         <div class="svg-chart" id="moistureChart"></div>
       </div>
       <div class="chart-card">
-        <h4>Температура ґрунту за 7 днів</h4>
-        <p class="sub">°C, дані з робота, поле №1</p>
+        <h4 data-i18n="charts.temp_title">Температура ґрунту за 7 днів</h4>
+        <p class="sub" data-i18n="charts.temp_sub">°C, дані з робота, поле №1</p>
         <div class="svg-chart" id="tempChart"></div>
       </div>
       <div class="chart-card">
-        <h4>pH по ділянках</h4>
-        <p class="sub">Точки відбору проб №1–6</p>
+        <h4 data-i18n="charts.ph_title">pH по ділянках</h4>
+        <p class="sub" data-i18n="charts.ph_sub">Точки відбору проб №1–6</p>
         <div class="svg-chart" id="phChart"></div>
       </div>
       <div class="chart-card">
-        <h4>NPK — поточний баланс</h4>
-        <p class="sub">mg/kg по ділянці</p>
+        <h4 data-i18n="charts.npk_title">NPK — поточний баланс</h4>
+        <p class="sub" data-i18n="charts.npk_sub">mg/kg по ділянці</p>
         <div class="svg-chart" id="npkChart"></div>
       </div>
     </div>
@@ -1114,11 +1131,11 @@ footer{padding:60px 0 40px;}
 <!-- CTA -->
 <section class="cta-section">
   <div class="cta-band reveal">
-    <h2>Готові оптимізувати ваше господарство?</h2>
-    <p>Зв'яжіться з нами для детальної консультації та демонстрації можливостей агроробота</p>
+    <h2 data-i18n="cta.title">Готові оптимізувати ваше господарство?</h2>
+    <p data-i18n="cta.subtitle">Зв'яжіться з нами для детальної консультації та демонстрації можливостей агроробота</p>
     <div class="cta-actions">
-      <button class="btn btn-primary" id="ctaConsultBtn">Замовити консультацію</button>
-      <button class="btn btn-ghost" id="ctaDocsBtn">Технічна документація →</button>
+      <button class="btn btn-primary" id="ctaConsultBtn" data-i18n="cta.consult">Замовити консультацію</button>
+      <button class="btn btn-ghost" id="ctaDocsBtn" data-i18n="cta.docs">Технічна документація →</button>
     </div>
   </div>
 </section>
@@ -1154,35 +1171,35 @@ footer{padding:60px 0 40px;}
 <div class="modal-overlay" id="accountModal">
   <div class="modal">
     <button class="modal-close" data-close>✕</button>
-    <h3>Увійти в акаунт</h3>
-    <p>Демонстраційний вхід у панель фермера. Введіть будь-які дані — реальна автентифікація ще не підключена.</p>
-    <div class="login-field"><label>Email</label><input type="email" placeholder="you@farm.ua" id="loginEmail"></div>
-    <div class="login-field"><label>Пароль</label><input type="password" placeholder="••••••••" id="loginPass"></div>
-    <button class="btn btn-dark" style="width:100%; justify-content:center;" id="loginSubmit">Увійти до панелі</button>
+    <h3 data-i18n="account.modal.title">Увійти в акаунт</h3>
+    <p data-i18n="account.modal.desc">Демонстраційний вхід у панель фермера. Введіть будь-які дані — реальна автентифікація ще не підключена.</p>
+    <div class="login-field"><label data-i18n="account.modal.email">Email</label><input type="email" placeholder="you@farm.ua" id="loginEmail"></div>
+    <div class="login-field"><label data-i18n="account.modal.password">Пароль</label><input type="password" placeholder="••••••••" id="loginPass"></div>
+    <button class="btn btn-dark" style="width:100%; justify-content:center;" id="loginSubmit" data-i18n="account.modal.submit">Увійти до панелі</button>
   </div>
 </div>
 
 <div class="modal-overlay" id="docsModal">
   <div class="modal">
     <button class="modal-close" data-close>✕</button>
-    <h3>Технічна документація</h3>
-    <p>Огляд ключових технічних матеріалів GruntPilot.</p>
-    <div class="doc-item"><h5>Специфікація сенсорів</h5><p>Діапазони вимірювання вологості, pH, EC, температури та NPK, глибина занурення зондів.</p></div>
-    <div class="doc-item"><h5>API передачі даних</h5><p>Формат пакетів телеметрії, частота передачі, протокол зв'язку робота з хмарою.</p></div>
-    <div class="doc-item"><h5>Recommendation engine</h5><p>Опис демонстраційного алгоритму формування рекомендацій щодо добрив на основі порогових значень.</p></div>
-    <div class="doc-item"><h5>Безпека та автономність</h5><p>Правила навігації полем, зупинка при перешкодах, GPS-точність.</p></div>
+    <h3 data-i18n="docs.modal.title">Технічна документація</h3>
+    <p data-i18n="docs.modal.desc">Огляд ключових технічних матеріалів GruntPilot.</p>
+    <div class="doc-item"><h5 data-i18n="docs.item1.title">Специфікація сенсорів</h5><p data-i18n="docs.item1.desc">Діапазони вимірювання вологості, pH, EC, температури та NPK, глибина занурення зондів.</p></div>
+    <div class="doc-item"><h5 data-i18n="docs.item2.title">API передачі даних</h5><p data-i18n="docs.item2.desc">Формат пакетів телеметрії, частота передачі, протокол зв'язку робота з хмарою.</p></div>
+    <div class="doc-item"><h5 data-i18n="docs.item3.title">Recommendation engine</h5><p data-i18n="docs.item3.desc">Опис демонстраційного алгоритму формування рекомендацій щодо добрив на основі порогових значень.</p></div>
+    <div class="doc-item"><h5 data-i18n="docs.item4.title">Безпека та автономність</h5><p data-i18n="docs.item4.desc">Правила навігації полем, зупинка при перешкодах, GPS-точність.</p></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="robotDetailsModal">
   <div class="modal">
     <button class="modal-close" data-close>✕</button>
-    <h3>GruntBot #4711-X — деталі</h3>
-    <p>Поточна місія та стан систем робота в реальному часі.</p>
-    <div class="doc-item"><h5>Місія</h5><p>Сканування поля №1 — етап 3 з 5, зона «Північний сектор».</p></div>
-    <div class="doc-item"><h5>Заряд батареї</h5><p>76% · орієнтовний запас ходу ще ≈ 3 год роботи.</p></div>
-    <div class="doc-item"><h5>Сенсори</h5><p>Усі 5 сенсорів активні: вологість, температура, pH, EC, NPK.</p></div>
-    <div class="doc-item"><h5>Зв'язок</h5><p>Бездротове з'єднання стабільне, останнє оновлення даних — щойно.</p></div>
+    <h3 data-i18n="robotmodal.title">GruntBot #4711-X — деталі</h3>
+    <p data-i18n="robotmodal.desc">Поточна місія та стан систем робота в реальному часі.</p>
+    <div class="doc-item"><h5 data-i18n="robotmodal.item1.title">Місія</h5><p data-i18n="robotmodal.item1.desc">Сканування поля №1 — етап 3 з 5, зона «Північний сектор».</p></div>
+    <div class="doc-item"><h5 data-i18n="robotmodal.item2.title">Заряд батареї</h5><p data-i18n="robotmodal.item2.desc">76% · орієнтовний запас ходу ще ≈ 3 год роботи.</p></div>
+    <div class="doc-item"><h5 data-i18n="robotmodal.item3.title">Сенсори</h5><p data-i18n="robotmodal.item3.desc">Усі 5 сенсорів активні: вологість, температура, pH, EC, NPK.</p></div>
+    <div class="doc-item"><h5 data-i18n="robotmodal.item4.title">Зв'язок</h5><p data-i18n="robotmodal.item4.desc">Бездротове з'єднання стабільне, останнє оновлення даних — щойно.</p></div>
   </div>
 </div>
 
@@ -1251,6 +1268,14 @@ const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', ()=>{
   navbar.classList.toggle('scrolled', window.scrollY > 8);
 });
+function syncNavbarHeight(){
+  const h = navbar.offsetHeight;
+  document.body.style.paddingTop = h + 'px';
+  document.getElementById('pageBackBtn').style.top = (h + 14) + 'px';
+}
+syncNavbarHeight();
+window.addEventListener('resize', syncNavbarHeight);
+window.addEventListener('load', syncNavbarHeight);
 const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
 hamburger.addEventListener('click', ()=> mobileMenu.classList.toggle('open'));
@@ -1270,11 +1295,47 @@ function closeDrawer(drawerId, overlayId){
 document.getElementById('quickMenuBtn').addEventListener('click', ()=> openDrawer('quickMenuDrawer','quickMenuOverlay'));
 document.getElementById('quickMenuClose').addEventListener('click', ()=> closeDrawer('quickMenuDrawer','quickMenuOverlay'));
 document.getElementById('quickMenuOverlay').addEventListener('click', ()=> closeDrawer('quickMenuDrawer','quickMenuOverlay'));
+/* ---------------- STORE PAGE MODE (Каталог / Добрива feel like a separate page) ---------------- */
+const STORE_PAGES = ['catalog','fertilizers'];
+let pageModePrevScroll = 0;
+
+function openStorePage(id){
+  pageModePrevScroll = window.scrollY;
+  document.body.classList.add('page-mode');
+  document.querySelectorAll('body > section').forEach(el=>{
+    el.style.display = (el.id === id) ? '' : 'none';
+  });
+  document.getElementById('pageBackBtn').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+function closeStorePage(){
+  if(!document.body.classList.contains('page-mode')) return;
+  document.body.classList.remove('page-mode');
+  document.querySelectorAll('body > section').forEach(el=> el.style.display = '');
+  document.getElementById('pageBackBtn').style.display = 'none';
+  window.scrollTo(0, pageModePrevScroll);
+}
+document.getElementById('pageBackBtn').addEventListener('click', closeStorePage);
+// Any normal in-page anchor (nav links, hero CTA, "На карту" etc.) should first exit page mode.
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click', ()=>{ if(document.body.classList.contains('page-mode')) closeStorePage(); });
+});
+
 document.querySelectorAll('[data-goto]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
-    if(btn.closest('#quickMenuDrawer')) closeDrawer('quickMenuDrawer','quickMenuOverlay');
-    const target = document.getElementById(btn.dataset.goto);
-    if(target) setTimeout(()=> target.scrollIntoView({behavior:'smooth', block:'start'}), btn.closest('#quickMenuDrawer') ? 200 : 0);
+    const fromDrawer = btn.closest('#quickMenuDrawer');
+    if(fromDrawer) closeDrawer('quickMenuDrawer','quickMenuOverlay');
+    const id = btn.dataset.goto;
+    const delay = fromDrawer ? 200 : 0;
+    setTimeout(()=>{
+      if(STORE_PAGES.includes(id)){
+        openStorePage(id);
+      } else {
+        closeStorePage();
+        const target = document.getElementById(id);
+        if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, delay);
   });
 });
 
@@ -1345,8 +1406,8 @@ cellData.forEach((c, i)=>{
   div.style.background = colorMap[c.status];
   div.dataset.idx = i;
   div.addEventListener('mouseenter', (e)=>{
-    tooltip.innerHTML = `<b>Точка #${i+1}</b>
-      <div><span>Вологість</span><span>${c.moisture}%</span></div>
+    tooltip.innerHTML = `<b>${t('tooltip.point')}${i+1}</b>
+      <div><span>${t('field.moisture')}</span><span>${c.moisture}%</span></div>
       <div><span>pH</span><span>${c.ph}</span></div>
       <div><span>N</span><span>${c.n} mg/kg</span></div>
       <div><span>P</span><span>${c.p} mg/kg</span></div>
@@ -1406,7 +1467,7 @@ let connected = false;
 document.getElementById('connectBtn').addEventListener('click', function(){
   connected = !connected;
   this.textContent = connected ? t('robot.disconnect') : t('robot.connect');
-  document.getElementById('robotStatus').textContent = connected ? 'Підключено (пряме керування)' : 'Онлайн';
+  document.getElementById('robotStatus').textContent = connected ? t('robot.status_connected') : t('robot.status_online');
   showToast(connected ? "З'єднання з роботом встановлено" : "З'єднання розірвано");
 });
 document.getElementById('robotDetailsBtn').addEventListener('click', ()=> openModal('robotDetailsModal'));
@@ -1442,26 +1503,30 @@ function generateFertilizerRecommendation({crop, area, soilType, ph, nitrogen, p
   });
 
   const warnings = [];
-  if(ph < 5.5) warnings.push('Необхідно звернути увагу на кислотність ґрунту — розгляньте вапнування перед основним підживленням.');
-  if(ph > 7.5) warnings.push('Необхідно звернути увагу на лужність ґрунту — засвоюваність деяких мікроелементів може бути знижена.');
-  if(moisture < 30) warnings.push('Низька вологість ґрунту — рекомендовано збільшити частоту поливу.');
-  if(moisture > 75) warnings.push('Висока вологість — перевірте дренаж ділянки.');
+  if(ph < 5.5) warnings.push('acid');
+  if(ph > 7.5) warnings.push('alkaline');
+  if(moisture < 30) warnings.push('moist_low');
+  if(moisture > 75) warnings.push('moist_high');
   if(typeof temperature === 'number'){
-    if(temperature < 8) warnings.push('Низька температура ґрунту може уповільнювати біологічну активність і засвоєння поживних речовин.');
-    if(temperature > 32) warnings.push('Висока температура ґрунту — контролюйте вологість, щоб уникнути теплового стресу рослин.');
+    if(temperature < 8) warnings.push('temp_low');
+    if(temperature > 32) warnings.push('temp_high');
   }
 
   return {soilStatus, nitrogenStatus, phosphorusStatus, potassiumStatus, moistureStatus, recommendations, warnings, crop, area, soilType};
 }
 
-const nutrientStatusLabel = {low:'Низький', mid:'Середній', high:'Оптимальний'};
+function nutrientStatusLabel(s){ return t('status.'+(s==='high'?'high':s)); }
 const nutrientBadgeClass = {low:'low', mid:'mid', high:'high'};
-const moistureStatusLabel = {low:'Низька', optimal:'Оптимальна', over:'Висока'};
+function moistureStatusLabel(s){ return s==='low' ? t('status.moist_low') : (s==='over' ? t('status.moist_over') : t('status.moist_optimal')); }
 const moistureBadgeClass = {low:'low', optimal:'high', over:'mid'};
-const phStatusLabel = {acid:'Кислий', alkaline:'Лужний', optimal:'Оптимальний'};
+function phStatusLabel(s){ return s==='acid' ? t('status.acid') : (s==='alkaline' ? t('status.alkaline') : t('status.ph_optimal')); }
 const phBadgeClass = {acid:'low', alkaline:'mid', optimal:'high'};
-const needPriorityLabel = {high:'Високий пріоритет', medium:'Середній пріоритет', low:'Низький пріоритет'};
+function needPriorityLabel(n){ return t('need.'+n); }
 const needTagClass = {high:'high', medium:'medium', low:'low'};
+const CROP_KEYS = {'Пшениця':'crop.wheat','Кукурудза':'crop.corn','Соняшник':'crop.sunflower','Ріпак':'crop.canola','Соя':'crop.soy'};
+const SOIL_KEYS = {'Чорнозем':'soil.chornozem','Суглинок':'soil.loam','Супісок':'soil.sandyloam','Глина':'soil.clay','Піщаний':'soil.sandy'};
+function cropLabel(v){ return CROP_KEYS[v] ? t(CROP_KEYS[v]) : v; }
+function soilLabel(v){ return SOIL_KEYS[v] ? t(SOIL_KEYS[v]) : v; }
 
 function barClass(s){ return s === 'low' ? 'low' : (s === 'mid' ? 'mid' : 'high'); }
 function barPct(v, max){ return Math.max(6, Math.min(100, Math.round(v/max*100))); }
@@ -1471,6 +1536,41 @@ const fieldIds = ['area','ph','nitrogen','phosphorus','potassium','moisture','te
 const fieldWrap = {area:'areaField', ph:'phField', nitrogen:'nField', phosphorus:'pField', potassium:'kField', moisture:'moistureField', temperature:'temperatureField'};
 
 let lastAnalysis = null; // зберігає {crop, area, soilType, vals, result} для кроку 2 — підбору добрив
+
+function renderAnalysisResult(){
+  if(!lastAnalysis) return;
+  const {crop, area, soilType, vals, result} = lastAnalysis;
+  const body = document.getElementById('resultBody');
+
+  const tile = (lbl, val, badgeClass, badgeText) => `
+    <div class="analysis-tile">
+      <div class="lbl">${lbl}</div>
+      <div class="val">${val}</div>
+      <span class="stat-badge ${badgeClass}">${badgeText}</span>
+    </div>`;
+
+  body.innerHTML = `
+    <div class="result-head">
+      <div>
+        <h3>${t('analysis.result_title')}</h3>
+        <p>${cropLabel(crop)} · ${vals.area} ${currentLang==='en'?'ha':'га'} · ${soilLabel(soilType)}</p>
+      </div>
+    </div>
+    <div class="analysis-grid">
+      ${tile(t('analysis.tile_ph'), vals.ph, phBadgeClass[result.soilStatus], phStatusLabel(result.soilStatus))}
+      ${tile(t('analysis.tile_n'), vals.nitrogen + ' mg/kg', nutrientBadgeClass[result.nitrogenStatus], nutrientStatusLabel(result.nitrogenStatus))}
+      ${tile(t('analysis.tile_p'), vals.phosphorus + ' mg/kg', nutrientBadgeClass[result.phosphorusStatus], nutrientStatusLabel(result.phosphorusStatus))}
+      ${tile(t('analysis.tile_k'), vals.potassium + ' mg/kg', nutrientBadgeClass[result.potassiumStatus], nutrientStatusLabel(result.potassiumStatus))}
+      ${tile(t('analysis.tile_moisture'), vals.moisture + '%', moistureBadgeClass[result.moistureStatus], moistureStatusLabel(result.moistureStatus))}
+      ${tile(t('analysis.tile_temp'), vals.temperature + '°C', 'high', t('analysis.measured'))}
+    </div>
+    <div class="unlock-row">
+      <p>${t('analysis.unlock_q')}</p>
+      <button type="button" class="btn btn-primary" id="unlockFertBtn">${t('analysis.unlock_btn')}</button>
+    </div>
+  `;
+  document.getElementById('unlockFertBtn').addEventListener('click', renderFertilizerRecommendation);
+}
 
 form.addEventListener('submit', function(e){
   e.preventDefault();
@@ -1490,7 +1590,7 @@ form.addEventListener('submit', function(e){
     if(!ok) valid = false;
     vals[id] = v;
   });
-  if(!valid){ showToast('Перевірте виділені поля форми'); return; }
+  if(!valid){ showToast(t('toast.support_invalid')); return; }
 
   const crop = document.getElementById('crop').value;
   const soilType = document.getElementById('soilType').value;
@@ -1499,58 +1599,30 @@ form.addEventListener('submit', function(e){
   lastAnalysis = {crop, area:vals.area, soilType, vals, result};
 
   document.getElementById('resultEmpty').style.display = 'none';
-  const body = document.getElementById('resultBody');
-  body.style.display = 'block';
-
-  const tile = (lbl, val, badgeClass, badgeText) => `
-    <div class="analysis-tile">
-      <div class="lbl">${lbl}</div>
-      <div class="val">${val}</div>
-      <span class="stat-badge ${badgeClass}">${badgeText}</span>
-    </div>`;
-
-  body.innerHTML = `
-    <div class="result-head">
-      <div>
-        <h3>Результат аналізу</h3>
-        <p>${crop} · ${vals.area} га · ${soilType}</p>
-      </div>
-    </div>
-    <div class="analysis-grid">
-      ${tile('pH', vals.ph, phBadgeClass[result.soilStatus], phStatusLabel[result.soilStatus])}
-      ${tile('Азот (N)', vals.nitrogen + ' mg/kg', nutrientBadgeClass[result.nitrogenStatus], nutrientStatusLabel[result.nitrogenStatus])}
-      ${tile('Фосфор (P)', vals.phosphorus + ' mg/kg', nutrientBadgeClass[result.phosphorusStatus], nutrientStatusLabel[result.phosphorusStatus])}
-      ${tile('Калій (K)', vals.potassium + ' mg/kg', nutrientBadgeClass[result.potassiumStatus], nutrientStatusLabel[result.potassiumStatus])}
-      ${tile('Вологість', vals.moisture + '%', moistureBadgeClass[result.moistureStatus], moistureStatusLabel[result.moistureStatus])}
-      ${tile('Температура', vals.temperature + '°C', 'high', 'Виміряно')}
-    </div>
-    <div class="unlock-row">
-      <p>Дані проаналізовано. Сформувати рекомендацію щодо добрив на основі цих показників?</p>
-      <button type="button" class="btn btn-primary" id="unlockFertBtn">Підібрати добриво →</button>
-    </div>
-  `;
-
-  document.getElementById('unlockFertBtn').addEventListener('click', renderFertilizerRecommendation);
-  body.scrollIntoView({behavior:'smooth', block:'nearest'});
+  document.getElementById('resultBody').style.display = 'block';
+  renderAnalysisResult();
+  document.getElementById('resultBody').scrollIntoView({behavior:'smooth', block:'nearest'});
 });
 
 function renderFertilizerRecommendation(){
   if(!lastAnalysis) return;
   const {crop, area, soilType, result} = lastAnalysis;
+  const shortKey = {nitrogen:'reco.n_short', phosphorus:'reco.p_short', potassium:'reco.k_short'};
+  const fullKey = {nitrogen:'reco.n_full', phosphorus:'reco.p_full', potassium:'reco.k_full'};
 
   const priorityCards = result.recommendations.map(r=>`
     <div class="priority-card">
-      <h5>${r.name.replace('живлення','').trim()}</h5>
-      <span class="priority-tag ${needTagClass[r.need]}">${needPriorityLabel[r.need]}</span>
+      <h5>${t(shortKey[r.key])}</h5>
+      <span class="priority-tag ${needTagClass[r.need]}">${needPriorityLabel(r.need)}</span>
     </div>`).join('');
 
   const strategyItems = result.recommendations.filter(r=>r.need !== 'low');
   const strategyHtml = strategyItems.length
-    ? strategyItems.map(r=>`<li>${r.name}</li>`).join('')
-    : `<li>Суттєвих дефіцитів не виявлено — підтримуйте поточний режим підживлення</li>`;
+    ? strategyItems.map(r=>`<li>${t(fullKey[r.key])}</li>`).join('')
+    : `<li>${t('reco.no_deficit')}</li>`;
 
   const warnHtml = result.warnings.length
-    ? `<div class="fert-warnings">${result.warnings.join('<br>')}</div>`
+    ? `<div class="fert-warnings">${result.warnings.map(w=>t('warn.'+w)).join('<br>')}</div>`
     : '';
 
   document.getElementById('fertEmpty').style.display = 'none';
@@ -1560,16 +1632,16 @@ function renderFertilizerRecommendation(){
     <div class="fert-card">
       <div class="fert-head">
         <div>
-          <h3>🌱 Рекомендація для поля №1</h3>
-          <p>${crop} · ${area} га · ${soilType}</p>
+          <h3>${t('reco.card_title')}</h3>
+          <p>${cropLabel(crop)} · ${area} ${currentLang==='en'?'ha':'га'} · ${soilLabel(soilType)}</p>
         </div>
-        <span class="badge ${result.soilStatus}">Ґрунт: ${phStatusLabel[result.soilStatus]}</span>
+        <span class="badge ${result.soilStatus}">${t('reco.soil_label')} ${phStatusLabel(result.soilStatus)}</span>
       </div>
       <div class="priority-grid">${priorityCards}</div>
-      <p class="strategy-title">Рекомендована стратегія</p>
+      <p class="strategy-title">${t('reco.strategy_title')}</p>
       <ol class="strategy-list">${strategyHtml}</ol>
       ${warnHtml}
-      <div class="fert-disclaimer">Демонстраційна рекомендація. Остаточні норми внесення мають визначатися агрономом на основі лабораторного аналізу, культури, ґрунту та локальних агрономічних норм.</div>
+      <div class="fert-disclaimer">${t('reco.disclaimer')}</div>
     </div>
   `;
   document.getElementById('recommendation').scrollIntoView({behavior:'smooth', block:'start'});
@@ -1629,14 +1701,16 @@ function renderBarChart(id, labels, data, colors, unit){
   </svg>`;
 }
 
-const weekLabels = ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
-renderLineChart('moistureChart', weekLabels, [61,64,66,63,68,70,68], '#2CA58D', '%');
-renderLineChart('tempChart', weekLabels, [14,15,17,16,18,19,17], '#E8B84B', '°');
+function renderAllCharts(){
+  const weekLabels = [t('day.mon'),t('day.tue'),t('day.wed'),t('day.thu'),t('day.fri'),t('day.sat'),t('day.sun')];
+  renderLineChart('moistureChart', weekLabels, [61,64,66,63,68,70,68], '#2CA58D', '%');
+  renderLineChart('tempChart', weekLabels, [14,15,17,16,18,19,17], '#E8B84B', '°');
 
-const plotLabels = ['№1','№2','№3','№4','№5','№6'];
-const plotPh = [6.1,6.4,6.8,5.6,7.2,6.3];
-renderBarChart('phChart', plotLabels, plotPh, plotPh.map(v => v < 5.5 ? '#C7654B' : (v > 7.5 ? '#E8B84B' : '#2CA58D')), '');
-renderBarChart('npkChart', ['N','P','K'], [82,38,145], ['#E8B84B','#C7654B','#2CA58D'], '');
+  const plotLabels = ['№1','№2','№3','№4','№5','№6'];
+  const plotPh = [6.1,6.4,6.8,5.6,7.2,6.3];
+  renderBarChart('phChart', plotLabels, plotPh, plotPh.map(v => v < 5.5 ? '#C7654B' : (v > 7.5 ? '#E8B84B' : '#2CA58D')), '');
+  renderBarChart('npkChart', ['N','P','K'], [82,38,145], ['#E8B84B','#C7654B','#2CA58D'], '');
+}
 
 /* =================================================================
    GRUNTPILOT STORE — data, cart/favorites, i18n, rendering
@@ -1745,11 +1819,12 @@ const PARTNERS_PLACEHOLDER = [
 /* ---------------- i18n ---------------- */
 const I18N = {
 ua:{
-  'nav.about':'Про нас','nav.tech':'Технологія','nav.how':'Як це працює','nav.features':'Можливості','nav.docs':'Документація','nav.account':'Увійти в акаунт',
+  'nav.about':'Про нас','nav.tech':'Технологія','nav.how':'Як це працює','nav.features':'Можливості','nav.docs':'Документація','nav.account':'Увійти в акаунт','nav.back':'На головну',
   'quickmenu.title':'Швидке меню','quickmenu.support':'Служба підтримки','quickmenu.partners':'Наші партнери','quickmenu.fertilizers':'Добрива','quickmenu.catalog':'Каталог',
   'robot.eyebrow':'Панель робота','robot.title':'Мій робот','robot.mission_live':'Робот збирає дані...','robot.status_label':'Статус:','robot.mission_label':'Місія:','robot.mission_name':'Сканування поля',
   'robot.charge':'Заряд','robot.covered':'Оброблено','robot.hours_short':'год','robot.uptime':'Час роботи','robot.connect':'Підключитись',"robot.disconnect":"Від'єднати",'robot.to_map':'На карту','robot.details':'Деталі',
   'robot.order_question':'Бажаєте замовити?','robot.catalog_cta':'Каталог',
+  'robot.status_online':'Онлайн','robot.status_connected':'Підключено (пряме керування)',
   'reco.eyebrow':'Розумний підбір добрив','reco.title':'Розумний підбір добрив','reco.subtitle':'Система аналізує показники ґрунту, культуру та параметри поля для формування демонстраційної рекомендації',
   'reco.empty_hint':'Спочатку виконайте «Аналіз ґрунту» вище, а потім натисніть «Підібрати добриво →», щоб отримати рекомендацію.',
   'reco.shop_hint_pre':'Для отримання додаткової інформації про добрива та їх придбання перейдіть до розділу',
@@ -1778,14 +1853,103 @@ ua:{
   'toast.added_cart':'Товар додано в кошик','toast.removed_cart':'Товар видалено з кошика','toast.added_fav':'Додано в обрані','toast.removed_fav':'Видалено з обраних',
   'toast.checkout':'Замовлення оформлено. Дякуємо!','toast.support_sent':"Повідомлення надіслано. Ми зв'яжемось з вами найближчим часом.",'toast.support_invalid':'Заповніть усі поля коректно',
   'toast.rental_need_check':'Підтвердіть згоду з умовами договору оренди','toast.rental_sent':'Заявку на оренду надіслано. Ми зв\'яжемось з вами для узгодження деталей.',
-  'toast.app_soon':'Посилання на завантаження застосунку (App Store / Google Play) буде додано найближчим часом.'
+  'toast.app_soon':'Посилання на завантаження застосунку (App Store / Google Play) буде додано найближчим часом.',
+
+  'hero.eyebrow':'Точне землеробство нового покоління',
+  'hero.title':'Автономний робот для моніторингу якості ґрунту',
+  'hero.lead':'Інноваційне рішення для точного землеробства. Наш робот автоматично збирає фізико-хімічні параметри ґрунту та передає дані для аналізу в реальному часі.',
+  'hero.cta_more':'Дізнатись більше →',
+  'hero.stat_sensors':'Типів сенсорів','hero.stat_monitoring':'Моніторинг','hero.stat_accuracy':'Точність',
+
+  'tech.eyebrow':'Сенсорна система','tech.title':'Комплексний аналіз ґрунту',
+  'tech.subtitle':'Наш робот оснащений передовими сенсорами для вимірювання ключових фізико-хімічних параметрів ґрунту',
+  'sensor.moisture.name':'Вологість','sensor.moisture.desc':'Точне вимірювання вмісту вологи у ґрунті на різних глибинах',
+  'sensor.temp.name':'Температура','sensor.temp.desc':'Моніторинг температури ґрунту для оптимального росту рослин',
+  'sensor.ph.name':'Кислотність (pH)','sensor.ph.desc':'Аналіз рівня pH для визначення придатності ґрунту',
+  'sensor.ec.name':'Електропровідність','sensor.ec.desc':'Вимірювання EC для оцінки вмісту солей та мінералів',
+  'sensor.npk.name':'NPK Елементи','sensor.npk.desc':'Визначення вмісту азоту, фосфору та калію в ґрунті',
+
+  'how.eyebrow':'Процес','how.title':'Як це працює',
+  'how.step1.title':'Автономна навігація','how.step1.desc':'Робот самостійно переміщується полем за допомогою GPS та датчиків навігації',
+  'how.step2.title':'Збір даних','how.step2.desc':'Сенсори занурюються в ґрунт та вимірюють всі ключові параметри',
+  'how.step3.title':'Передача у хмару','how.step3.desc':"Дані миттєво передаються до інформаційної системи через бездротовий зв'язок",
+  'how.step4.title':'Аналіз та рекомендації','how.step4.desc':'Система аналізує дані та формує персоналізовані рекомендації для агронома',
+
+  'features.eyebrow':'Переваги','features.title':'Чому обрати наше рішення',
+  'features.subtitle':'Інтелектуальний моніторинг ґрунту для сучасного аграрного бізнесу',
+  'features.yield.title':'Підвищення врожайності','features.yield.note':'Заявлена ціль на основі пілотних господарств',
+  'features.time.title':'Економія часу','features.time.note':'Порівняно з ручним відбором проб',
+  'features.precision.title':'Точне землеробство','features.precision.note':"Прив'язка кожної проби до координат",
+  'features.eco.title':'Збереження довкілля','features.eco.note':'Менше надлишкового внесення добрив',
+
+  'field.eyebrow':'Моніторинг поля','field.title':'Моніторинг вашого поля',
+  'field.subtitle':'Карта поля, стан робота та ключові показники ґрунту — в одному місці, оновлюється в реальному часі',
+  'field.flow.field':'Поле','field.flow.robot':'Робот','field.flow.sensors':'Сенсори','field.flow.analysis':'Аналіз','field.flow.reco':'Рекомендація',
+  'field.map_title':'Карта поля №1 · 76 га','field.legend.ok':'Норма','field.legend.mid':'Увага','field.legend.low':'Дефіцит',
+  'field.note':'Наведіть курсор на точку відбору проби, щоб побачити виміряні параметри. Білі крапки — точки, де робот здійснив вимірювання; пунктирна лінія показує маршрут робота.',
+  'field.stats_title':'Поле №1 · 76 га','field.status_title':'Статус','field.robot_online':'Робот онлайн',
+  'field.moisture':'Вологість','field.ph':'pH','field.n':'Азот (N)','field.p':'Фосфор (P)','field.k':'Калій (K)','field.soil_index':'Загальний індекс ґрунту',
+  'tooltip.point':'Точка #',
+
+  'analysis.eyebrow':'Аналіз ґрунту','analysis.title':'Проаналізуйте показники вашого поля',
+  'analysis.subtitle':"Введіть дані з робота або лабораторного аналізу — результат з'явиться одразу на сторінці, без перезавантаження",
+  'analysis.label_crop':'Культура','analysis.label_soil':'Тип ґрунту','analysis.label_area':'Площа поля, га','analysis.label_ph':'pH ґрунту',
+  'analysis.label_n':'Азот (N), mg/kg','analysis.label_p':'Фосфор (P), mg/kg','analysis.label_k':'Калій (K), mg/kg',
+  'analysis.label_moisture':'Вологість, %','analysis.label_temp':'Температура ґрунту, °C',
+  'analysis.err_area':'Вкажіть площу більшу за 0','analysis.err_ph':'pH має бути в діапазоні 3–10',
+  'analysis.err_n':'Вкажіть значення від 0 і вище','analysis.err_p':'Вкажіть значення від 0 і вище','analysis.err_k':'Вкажіть значення від 0 і вище',
+  'analysis.err_moisture':'Вкажіть значення від 0 до 100','analysis.err_temp':'Вкажіть значення від -10 до 45',
+  'analysis.submit':'Проаналізувати ґрунт','analysis.empty_hint':'Заповніть форму зліва та натисніть «Проаналізувати ґрунт», щоб побачити результат аналізу.',
+  'crop.wheat':'Пшениця','crop.corn':'Кукурудза','crop.sunflower':'Соняшник','crop.canola':'Ріпак','crop.soy':'Соя',
+  'soil.chornozem':'Чорнозем','soil.loam':'Суглинок','soil.sandyloam':'Супісок','soil.clay':'Глина','soil.sandy':'Піщаний',
+  'analysis.result_title':'Результат аналізу','analysis.tile_ph':'pH','analysis.tile_n':'Азот (N)','analysis.tile_p':'Фосфор (P)','analysis.tile_k':'Калій (K)','analysis.tile_moisture':'Вологість','analysis.tile_temp':'Температура',
+  'analysis.measured':'Виміряно','analysis.unlock_q':'Дані проаналізовано. Сформувати рекомендацію щодо добрив на основі цих показників?','analysis.unlock_btn':'Підібрати добриво →',
+  'status.low':'Низький','status.mid':'Середній','status.high':'Оптимальний',
+  'status.moist_low':'Низька','status.moist_optimal':'Оптимальна','status.moist_over':'Висока',
+  'status.acid':'Кислий','status.alkaline':'Лужний','status.ph_optimal':'Оптимальний',
+  'reco.card_title':'🌱 Рекомендація для поля №1','reco.soil_label':'Ґрунт:','reco.strategy_title':'Рекомендована стратегія',
+  'reco.n_short':'Азотне','reco.p_short':'Фосфорне','reco.k_short':'Калійне',
+  'reco.n_full':'Азотне живлення','reco.p_full':'Фосфорне живлення','reco.k_full':'Калійне живлення',
+  'reco.no_deficit':'Суттєвих дефіцитів не виявлено — підтримуйте поточний режим підживлення',
+  'reco.disclaimer':'Демонстраційна рекомендація. Остаточні норми внесення мають визначатися агрономом на основі лабораторного аналізу, культури, ґрунту та локальних агрономічних норм.',
+  'warn.acid':'Необхідно звернути увагу на кислотність ґрунту — розгляньте вапнування перед основним підживленням.',
+  'warn.alkaline':'Необхідно звернути увагу на лужність ґрунту — засвоюваність деяких мікроелементів може бути знижена.',
+  'warn.moist_low':'Низька вологість ґрунту — рекомендовано збільшити частоту поливу.',
+  'warn.moist_high':'Висока вологість — перевірте дренаж ділянки.',
+  'warn.temp_low':'Низька температура ґрунту може уповільнювати біологічну активність і засвоєння поживних речовин.',
+  'warn.temp_high':'Висока температура ґрунту — контролюйте вологість, щоб уникнути теплового стресу рослин.',
+  'need.high':'Високий пріоритет','need.medium':'Середній пріоритет','need.low':'Низький пріоритет',
+
+  'charts.eyebrow':'Динаміка','charts.title':'Показники в динаміці','charts.subtitle':'Демонстраційні дані з робота за тиждень та по точках відбору проб',
+  'charts.moisture_title':'Вологість ґрунту за 7 днів','charts.moisture_sub':'%, дані з робота, поле №1',
+  'charts.temp_title':'Температура ґрунту за 7 днів','charts.temp_sub':'°C, дані з робота, поле №1',
+  'charts.ph_title':'pH по ділянках','charts.ph_sub':'Точки відбору проб №1–6',
+  'charts.npk_title':'NPK — поточний баланс','charts.npk_sub':'mg/kg по ділянці',
+  'day.mon':'Пн','day.tue':'Вт','day.wed':'Ср','day.thu':'Чт','day.fri':'Пт','day.sat':'Сб','day.sun':'Нд',
+
+  'cta.title':'Готові оптимізувати ваше господарство?','cta.subtitle':'Зв\'яжіться з нами для детальної консультації та демонстрації можливостей агроробота',
+  'cta.consult':'Замовити консультацію','cta.docs':'Технічна документація →',
+
+  'account.modal.title':'Увійти в акаунт','account.modal.desc':'Демонстраційний вхід у панель фермера. Введіть будь-які дані — реальна автентифікація ще не підключена.',
+  'account.modal.email':'Email','account.modal.password':'Пароль','account.modal.submit':'Увійти до панелі',
+  'docs.modal.title':'Технічна документація','docs.modal.desc':'Огляд ключових технічних матеріалів GruntPilot.',
+  'docs.item1.title':'Специфікація сенсорів','docs.item1.desc':'Діапазони вимірювання вологості, pH, EC, температури та NPK, глибина занурення зондів.',
+  'docs.item2.title':'API передачі даних','docs.item2.desc':'Формат пакетів телеметрії, частота передачі, протокол зв\'язку робота з хмарою.',
+  'docs.item3.title':'Recommendation engine','docs.item3.desc':'Опис демонстраційного алгоритму формування рекомендацій щодо добрив на основі порогових значень.',
+  'docs.item4.title':'Безпека та автономність','docs.item4.desc':'Правила навігації полем, зупинка при перешкодах, GPS-точність.',
+  'robotmodal.title':'GruntBot #4711-X — деталі','robotmodal.desc':'Поточна місія та стан систем робота в реальному часі.',
+  'robotmodal.item1.title':'Місія','robotmodal.item1.desc':'Сканування поля №1 — етап 3 з 5, зона «Північний сектор».',
+  'robotmodal.item2.title':'Заряд батареї','robotmodal.item2.desc':'76% · орієнтовний запас ходу ще ≈ 3 год роботи.',
+  'robotmodal.item3.title':'Сенсори','robotmodal.item3.desc':'Усі 5 сенсорів активні: вологість, температура, pH, EC, NPK.',
+  'robotmodal.item4.title':'Зв\'язок','robotmodal.item4.desc':'Бездротове з\'єднання стабільне, останнє оновлення даних — щойно.'
 },
 en:{
-  'nav.about':'About','nav.tech':'Technology','nav.how':'How it works','nav.features':'Features','nav.docs':'Documentation','nav.account':'Log in to account',
+  'nav.about':'About','nav.tech':'Technology','nav.how':'How it works','nav.features':'Features','nav.docs':'Documentation','nav.account':'Log in to account','nav.back':'Back to home',
   'quickmenu.title':'Quick menu','quickmenu.support':'Support','quickmenu.partners':'Our partners','quickmenu.fertilizers':'Fertilizers','quickmenu.catalog':'Catalog',
   'robot.eyebrow':'Robot panel','robot.title':'My Robot','robot.mission_live':'Robot is collecting data...','robot.status_label':'Status:','robot.mission_label':'Mission:','robot.mission_name':'Field scan',
   'robot.charge':'Battery','robot.covered':'Covered','robot.hours_short':'h','robot.uptime':'Uptime','robot.connect':'Connect','robot.disconnect':'Disconnect','robot.to_map':'To the map','robot.details':'Details',
   'robot.order_question':'Want to order one?','robot.catalog_cta':'Catalog',
+  'robot.status_online':'Online','robot.status_connected':'Connected (direct control)',
   'reco.eyebrow':'Smart Fertilizer Selection','reco.title':'Smart Fertilizer Selection','reco.subtitle':'The system analyzes soil indicators, crop and field parameters to produce a demonstration recommendation',
   'reco.empty_hint':'First run "Soil Analysis" above, then click "Get Fertilizer Recommendation →" to see a result.',
   'reco.shop_hint_pre':'For more information about fertilizers and how to purchase them, go to the',
@@ -1814,7 +1978,95 @@ en:{
   'toast.added_cart':'Item added to cart','toast.removed_cart':'Item removed from cart','toast.added_fav':'Added to favorites','toast.removed_fav':'Removed from favorites',
   'toast.checkout':'Order placed. Thank you!','toast.support_sent':"Message sent. We'll get back to you shortly.",'toast.support_invalid':'Please fill in all fields correctly',
   'toast.rental_need_check':'Please confirm you agree to the rental contract terms','toast.rental_sent':"Rental request sent. We'll contact you to arrange the details.",
-  'toast.app_soon':'The app download link (App Store / Google Play) will be added soon.'
+  'toast.app_soon':'The app download link (App Store / Google Play) will be added soon.',
+
+  'hero.eyebrow':'The new generation of precision agriculture',
+  'hero.title':'Autonomous robot for soil quality monitoring',
+  'hero.lead':'An innovative solution for precision agriculture. Our robot automatically collects physical and chemical soil parameters and transmits data for real-time analysis.',
+  'hero.cta_more':'Learn more →',
+  'hero.stat_sensors':'Sensor types','hero.stat_monitoring':'Monitoring','hero.stat_accuracy':'Accuracy',
+
+  'tech.eyebrow':'Sensor system','tech.title':'Comprehensive soil analysis',
+  'tech.subtitle':'Our robot is equipped with advanced sensors for measuring key physical and chemical soil parameters',
+  'sensor.moisture.name':'Moisture','sensor.moisture.desc':'Precise measurement of soil moisture content at various depths',
+  'sensor.temp.name':'Temperature','sensor.temp.desc':'Monitoring soil temperature for optimal plant growth',
+  'sensor.ph.name':'Acidity (pH)','sensor.ph.desc':'pH level analysis to determine soil suitability',
+  'sensor.ec.name':'Electrical conductivity','sensor.ec.desc':'EC measurement to assess salt and mineral content',
+  'sensor.npk.name':'NPK elements','sensor.npk.desc':'Determining nitrogen, phosphorus and potassium content in soil',
+
+  'how.eyebrow':'Process','how.title':'How it works',
+  'how.step1.title':'Autonomous navigation','how.step1.desc':'The robot moves across the field on its own using GPS and navigation sensors',
+  'how.step2.title':'Data collection','how.step2.desc':'Sensors probe the soil and measure all key parameters',
+  'how.step3.title':'Cloud transfer','how.step3.desc':'Data is instantly transmitted to the information system via wireless connection',
+  'how.step4.title':'Analysis & recommendations','how.step4.desc':'The system analyzes the data and generates personalized recommendations for the agronomist',
+
+  'features.eyebrow':'Advantages','features.title':'Why choose our solution',
+  'features.subtitle':'Intelligent soil monitoring for modern agribusiness',
+  'features.yield.title':'Higher yield','features.yield.note':'A stated goal based on pilot farms',
+  'features.time.title':'Time savings','features.time.note':'Compared to manual sample collection',
+  'features.precision.title':'Precision agriculture','features.precision.note':'Every sample linked to coordinates',
+  'features.eco.title':'Environmental protection','features.eco.note':'Less excess fertilizer use',
+
+  'field.eyebrow':'Field monitoring','field.title':'Monitor your field',
+  'field.subtitle':'The field map, robot status and key soil indicators in one place, updated in real time',
+  'field.flow.field':'Field','field.flow.robot':'Robot','field.flow.sensors':'Sensors','field.flow.analysis':'Analysis','field.flow.reco':'Recommendation',
+  'field.map_title':'Field map #1 · 76 ha','field.legend.ok':'Normal','field.legend.mid':'Attention','field.legend.low':'Deficiency',
+  'field.note':'Hover over a sampling point to see the measured parameters. White dots mark the points where the robot took measurements; the dashed line shows the robot\'s route.',
+  'field.stats_title':'Field #1 · 76 ha','field.status_title':'Status','field.robot_online':'Robot online',
+  'field.moisture':'Moisture','field.ph':'pH','field.n':'Nitrogen (N)','field.p':'Phosphorus (P)','field.k':'Potassium (K)','field.soil_index':'Overall soil index',
+  'tooltip.point':'Point #',
+
+  'analysis.eyebrow':'Soil analysis','analysis.title':'Analyze your field indicators',
+  'analysis.subtitle':'Enter data from the robot or a lab analysis — the result appears instantly on the page, no reload needed',
+  'analysis.label_crop':'Crop','analysis.label_soil':'Soil type','analysis.label_area':'Field area, ha','analysis.label_ph':'Soil pH',
+  'analysis.label_n':'Nitrogen (N), mg/kg','analysis.label_p':'Phosphorus (P), mg/kg','analysis.label_k':'Potassium (K), mg/kg',
+  'analysis.label_moisture':'Moisture, %','analysis.label_temp':'Soil temperature, °C',
+  'analysis.err_area':'Enter an area greater than 0','analysis.err_ph':'pH must be between 3 and 10',
+  'analysis.err_n':'Enter a value of 0 or higher','analysis.err_p':'Enter a value of 0 or higher','analysis.err_k':'Enter a value of 0 or higher',
+  'analysis.err_moisture':'Enter a value between 0 and 100','analysis.err_temp':'Enter a value between -10 and 45',
+  'analysis.submit':'Analyze soil','analysis.empty_hint':'Fill in the form on the left and click "Analyze soil" to see the analysis result.',
+  'crop.wheat':'Wheat','crop.corn':'Corn','crop.sunflower':'Sunflower','crop.canola':'Canola','crop.soy':'Soybean',
+  'soil.chornozem':'Chernozem','soil.loam':'Loam','soil.sandyloam':'Sandy loam','soil.clay':'Clay','soil.sandy':'Sandy',
+  'analysis.result_title':'Analysis result','analysis.tile_ph':'pH','analysis.tile_n':'Nitrogen (N)','analysis.tile_p':'Phosphorus (P)','analysis.tile_k':'Potassium (K)','analysis.tile_moisture':'Moisture','analysis.tile_temp':'Temperature',
+  'analysis.measured':'Measured','analysis.unlock_q':'Data analyzed. Generate a fertilizer recommendation based on these indicators?','analysis.unlock_btn':'Get fertilizer recommendation →',
+  'status.low':'Low','status.mid':'Medium','status.high':'Optimal',
+  'status.moist_low':'Low','status.moist_optimal':'Optimal','status.moist_over':'High',
+  'status.acid':'Acidic','status.alkaline':'Alkaline','status.ph_optimal':'Optimal',
+  'reco.card_title':'🌱 Recommendation for Field #1','reco.soil_label':'Soil:','reco.strategy_title':'Recommended strategy',
+  'reco.n_short':'Nitrogen','reco.p_short':'Phosphorus','reco.k_short':'Potassium',
+  'reco.n_full':'Nitrogen nutrition','reco.p_full':'Phosphorus nutrition','reco.k_full':'Potassium nutrition',
+  'reco.no_deficit':'No significant deficiencies detected — maintain the current feeding regimen',
+  'reco.disclaimer':'This is a demonstration recommendation. Final application rates should be determined by an agronomist based on lab analysis, crop, soil and local agronomic standards.',
+  'warn.acid':'Attention needed on soil acidity — consider liming before the main feeding.',
+  'warn.alkaline':'Attention needed on soil alkalinity — uptake of some micronutrients may be reduced.',
+  'warn.moist_low':'Low soil moisture — increasing irrigation frequency is recommended.',
+  'warn.moist_high':'High moisture — check the plot\'s drainage.',
+  'warn.temp_low':'Low soil temperature may slow biological activity and nutrient uptake.',
+  'warn.temp_high':'High soil temperature — monitor moisture to avoid heat stress on plants.',
+  'need.high':'High priority','need.medium':'Medium priority','need.low':'Low priority',
+
+  'charts.eyebrow':'Trends','charts.title':'Indicators over time','charts.subtitle':'Demonstration data from the robot over a week and across sampling points',
+  'charts.moisture_title':'Soil moisture over 7 days','charts.moisture_sub':'%, robot data, Field #1',
+  'charts.temp_title':'Soil temperature over 7 days','charts.temp_sub':'°C, robot data, Field #1',
+  'charts.ph_title':'pH by plot','charts.ph_sub':'Sampling points #1–6',
+  'charts.npk_title':'NPK — current balance','charts.npk_sub':'mg/kg per plot',
+  'day.mon':'Mon','day.tue':'Tue','day.wed':'Wed','day.thu':'Thu','day.fri':'Fri','day.sat':'Sat','day.sun':'Sun',
+
+  'cta.title':'Ready to optimize your farm?','cta.subtitle':'Contact us for a detailed consultation and a demonstration of the agri-robot\'s capabilities',
+  'cta.consult':'Request a consultation','cta.docs':'Technical documentation →',
+
+  'account.modal.title':'Log in to account','account.modal.desc':'A demonstration login for the farmer panel. Enter any data — real authentication is not connected yet.',
+  'account.modal.email':'Email','account.modal.password':'Password','account.modal.submit':'Log in to the panel',
+  'docs.modal.title':'Technical documentation','docs.modal.desc':'An overview of GruntPilot\'s key technical materials.',
+  'docs.item1.title':'Sensor specification','docs.item1.desc':'Measurement ranges for moisture, pH, EC, temperature and NPK, probe insertion depth.',
+  'docs.item2.title':'Data transmission API','docs.item2.desc':'Telemetry packet format, transmission frequency, robot-to-cloud communication protocol.',
+  'docs.item3.title':'Recommendation engine','docs.item3.desc':'Description of the demonstration algorithm for generating fertilizer recommendations based on threshold values.',
+  'docs.item4.title':'Safety & autonomy','docs.item4.desc':'Field navigation rules, obstacle stopping, GPS accuracy.',
+  'robotmodal.title':'GruntBot #4711-X — Details','robotmodal.desc':'Current mission and system status of the robot in real time.',
+  'robotmodal.item1.title':'Mission','robotmodal.item1.desc':'Scanning Field #1 — stage 3 of 5, "North sector" zone.',
+  'robotmodal.item2.title':'Battery charge','robotmodal.item2.desc':'76% · estimated runtime remaining ≈ 3 hours of work.',
+  'robotmodal.item3.title':'Sensors','robotmodal.item3.desc':'All 5 sensors active: moisture, temperature, pH, EC, NPK.',
+  'robotmodal.item4.title':'Connectivity','robotmodal.item4.desc':'Wireless connection stable, data last updated just now.'
 }
 };
 let currentLang = localStorage.getItem('gp_lang') || 'ua';
@@ -1834,7 +2086,11 @@ function setLanguage(lang){
   localStorage.setItem('gp_lang', lang);
   applyStaticTranslations();
   renderCatalog(); renderFertilizerCatalog(); renderPartners(); renderFAQ(); renderReviews();
-  renderCart(); renderFavorites();
+  renderCart(); renderFavorites(); renderAllCharts();
+  document.getElementById('robotStatus').textContent = connected ? t('robot.status_connected') : t('robot.status_online');
+  document.getElementById('connectBtn').textContent = connected ? t('robot.disconnect') : t('robot.connect');
+  if(lastAnalysis) renderAnalysisResult();
+  if(document.getElementById('fertBody').style.display === 'block') renderFertilizerRecommendation();
 }
 document.querySelectorAll('.lang-toggle button').forEach(btn=>{
   btn.addEventListener('click', ()=> setLanguage(btn.dataset.lang));
@@ -2268,6 +2524,9 @@ renderFAQ();
 renderReviews();
 renderCart();
 renderFavorites();
+renderAllCharts();
+document.getElementById('robotStatus').textContent = t('robot.status_online');
+document.getElementById('connectBtn').textContent = t('robot.connect');
 </script>
 </body>
 </html>
