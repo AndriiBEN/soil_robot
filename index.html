@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoilScout — автономний робот для моніторингу якості ґрунту</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F7F2;
+  --bg-card:#FFFFFF;
+  --bg-card-alt:#FBFBF6;
+  --ink:#1C2420;
+  --ink-soft:#5B6459;
+  --border:#E4E4DA;
+  --primary:#173B2C;
+  --primary-2:#1F4E39;
+  --accent:#2CA58D;
+  --accent-light:#8FD6C4;
+  --sun:#E8B84B;
+  --danger:#C7654B;
+  --dash-bg:#0E241D;
+  --dash-card:#153428;
+  --dash-line:#25493A;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:10px;
+  --shadow-soft:0 10px 30px -18px rgba(23,59,44,0.35);
+  --shadow-card:0 1px 2px rgba(23,59,44,0.06), 0 8px 24px -16px rgba(23,59,44,0.18);
+  --maxw:1180px;
+}
+:root[data-theme="dark-ignore"]{}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Manrope',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.mono{font-family:'JetBrains Mono',monospace;}
+img,svg{max-width:100%;}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px;}
+a{color:inherit;}
+button{font-family:inherit;}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
+
+/* ---------- NAVBAR ---------- */
+.navbar{
+  position:sticky; top:0; z-index:100;
+  background:rgba(247,247,242,0.86);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid transparent;
+  transition:border-color .25s ease, box-shadow .25s ease;
+}
+.navbar.scrolled{border-bottom-color:var(--border); box-shadow:0 4px 20px -18px rgba(0,0,0,0.4);}
+.nav-inner{
+  max-width:var(--maxw); margin:0 auto; padding:16px 28px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.brand{display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.15rem; letter-spacing:-0.01em;}
+.brand-mark{width:34px; height:34px; border-radius:9px; background:linear-gradient(155deg,var(--primary),var(--accent)); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.brand-mark svg{width:19px; height:19px;}
+.nav-links{display:flex; gap:34px; list-style:none; margin:0; padding:0;}
+.nav-links a{text-decoration:none; color:var(--ink-soft); font-weight:600; font-size:0.95rem; transition:color .2s;}
+.nav-links a:hover{color:var(--primary);}
+.nav-cta{
+  background:var(--primary); color:#fff; border:none; padding:11px 22px; border-radius:999px;
+  font-weight:700; font-size:0.92rem; cursor:pointer; transition:background .2s, transform .2s;
+}
+.nav-cta:hover{background:var(--primary-2); transform:translateY(-1px);}
+.hamburger{display:none; background:none; border:none; cursor:pointer; padding:6px; flex-direction:column; gap:5px;}
+.hamburger span{width:24px; height:2px; background:var(--primary); border-radius:2px; transition:.25s;}
+.mobile-menu{display:none; flex-direction:column; padding:8px 28px 22px; gap:4px; border-bottom:1px solid var(--border); background:var(--bg);}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{padding:12px 4px; text-decoration:none; color:var(--ink); font-weight:600; border-bottom:1px solid var(--border);}
+.mobile-menu a:last-of-type{border-bottom:none;}
+.mobile-menu .nav-cta{margin-top:10px; align-self:flex-start;}
+
+@media (max-width:880px){
+  .nav-links{display:none;}
+  .nav-cta{display:none;}
+  .hamburger{display:flex;}
+}
+
+/* ---------- HERO ---------- */
+.hero{
+  position:relative;
+  min-height:92vh;
+  display:flex; align-items:center;
+  color:#fff;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse 90% 60% at 20% 0%, rgba(44,165,141,0.35), transparent 60%),
+    linear-gradient(180deg, #0E2A1F 0%, #123326 45%, #1B4433 100%);
+}
+.hero-field{
+  position:absolute; inset:0; z-index:0; opacity:0.55;
+  background-image: repeating-linear-gradient(100deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 34px);
+}
+.hero-vignette{position:absolute; inset:0; background:linear-gradient(180deg, rgba(9,26,19,0.35) 0%, rgba(9,26,19,0.15) 35%, rgba(9,26,19,0.85) 100%); z-index:1;}
+.hero-inner{position:relative; z-index:2; width:100%; padding:130px 0 90px;}
+.hero-grid{display:grid; grid-template-columns:1.05fr 0.95fr; gap:40px; align-items:center;}
+.hero-eyebrow{
+  display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18);
+  padding:7px 14px; border-radius:999px; font-size:0.82rem; font-weight:600; color:var(--accent-light); margin-bottom:22px;
+}
+.hero-eyebrow .dot{width:7px; height:7px; border-radius:50%; background:#4EE0B4; box-shadow:0 0 0 4px rgba(78,224,180,0.25); animation:pulse 2.2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.hero h1{
+  font-size:clamp(2.4rem, 4.6vw, 3.7rem); line-height:1.06; letter-spacing:-0.02em; font-weight:800; margin:0 0 22px;
+}
+.hero p.lead{font-size:1.14rem; line-height:1.6; color:rgba(255,255,255,0.82); max-width:520px; margin:0 0 34px;}
+.hero-actions{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:56px;}
+.btn{
+  border:none; border-radius:999px; padding:15px 26px; font-weight:700; font-size:0.98rem; cursor:pointer;
+  display:inline-flex; align-items:center; gap:8px; transition:transform .18s ease, background .2s ease, box-shadow .2s;
+  text-decoration:none;
+}
+.btn-primary{background:var(--accent); color:#08251C;}
+.btn-primary:hover{background:#3BC1A5; transform:translateY(-2px); box-shadow:0 12px 24px -10px rgba(44,165,141,0.55);}
+.btn-ghost{background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.35);}
+.btn-ghost:hover{background:rgba(255,255,255,0.16); transform:translateY(-2px);}
+.btn-dark{background:var(--primary); color:#fff;}
+.btn-dark:hover{background:var(--primary-2); transform:translateY(-2px);}
+.btn-outline{background:transparent; color:var(--primary); border:1.5px solid var(--border);}
+.btn-outline:hover{border-color:var(--primary); background:rgba(23,59,44,0.04);}
+.btn:disabled{opacity:0.5; cursor:not-allowed; transform:none !important;}
+
+.hero-stats{display:flex; gap:44px; flex-wrap:wrap;}
+.hero-stat b{display:block; font-size:1.9rem; font-weight:800; font-family:'JetBrains Mono',monospace;}
+.hero-stat span{font-size:0.85rem; color:rgba(255,255,255,0.65);}
+
+.hero-robot{position:relative; display:flex; align-items:center; justify-content:center;}
+.hero-robot svg{width:100%; max-width:460px; filter:drop-shadow(0 30px 40px rgba(0,0,0,0.45));}
+.robot-scan{transform-origin:center; animation:scan 3.4s ease-in-out infinite;}
+@keyframes scan{0%,100%{opacity:0.35; transform:scaleY(0.4);}50%{opacity:1; transform:scaleY(1);}}
+.robot-led{animation:led 1.6s ease-in-out infinite;}
+@keyframes led{0%,100%{opacity:1;}50%{opacity:0.25;}}
+
+@media (max-width:880px){
+  .hero-grid{grid-template-columns:1fr; text-align:left;}
+  .hero-robot{order:-1; margin-bottom:10px;}
+  .hero-robot svg{max-width:280px;}
+}
+
+/* ---------- GENERIC SECTION ---------- */
+section{padding:108px 0;}
+.section-head{max-width:640px; margin:0 0 56px;}
+.section-head.center{margin-left:auto; margin-right:auto; text-align:center;}
+.eyebrow-tag{font-size:0.85rem; font-weight:700; color:var(--accent); margin:0 0 12px;}
+.section-head h2{font-size:clamp(1.7rem,3vw,2.5rem); line-height:1.15; letter-spacing:-0.015em; margin:0 0 16px; color:var(--primary);}
+.section-head p{font-size:1.05rem; color:var(--ink-soft); line-height:1.65; margin:0;}
+
+.reveal{opacity:0; transform:translateY(22px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+
+/* ---------- SENSORS ---------- */
+.sensor-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:18px;}
+.sensor-card{
+  background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:26px 20px; box-shadow:var(--shadow-card); transition:transform .22s ease, box-shadow .22s ease;
+}
+.sensor-card:hover{transform:translateY(-5px); box-shadow:0 20px 40px -22px rgba(23,59,44,0.4);}
+.sensor-icon{
+  width:46px; height:46px; border-radius:12px; background:linear-gradient(155deg,#EAF6F1,#D8EFE7);
+  display:flex; align-items:center; justify-content:center; margin-bottom:18px; color:var(--primary);
+}
+.sensor-icon svg{width:24px; height:24px;}
+.sensor-card h3{font-size:1.02rem; margin:0 0 8px; color:var(--ink);}
+.sensor-card p{font-size:0.88rem; color:var(--ink-soft); line-height:1.55; margin:0;}
+@media (max-width:1000px){.sensor-grid{grid-template-columns:repeat(3,1fr);}}
+@media (max-width:640px){.sensor-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ---------- HOW IT WORKS ---------- */
+.steps-band{background:var(--primary); color:#fff; border-radius:28px; padding:70px 48px; position:relative; overflow:hidden;}
+.steps-band::before{content:""; position:absolute; inset:0; background:radial-gradient(circle at 85% 20%, rgba(44,165,141,0.25), transparent 55%);}
+.steps-row{position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:0;}
+.step{padding:0 22px; border-left:1px solid rgba(255,255,255,0.14); position:relative;}
+.step:first-child{border-left:none;}
+.step-num{font-family:'JetBrains Mono',monospace; font-size:0.95rem; color:var(--accent-light); font-weight:600; margin-bottom:18px; display:block;}
+.step h3{font-size:1.08rem; margin:0 0 10px;}
+.step p{font-size:0.9rem; color:rgba(255,255,255,0.72); line-height:1.6; margin:0;}
+.steps-track{height:3px; background:rgba(255,255,255,0.15); border-radius:3px; margin-bottom:46px; position:relative; overflow:hidden;}
+.steps-track-fill{position:absolute; inset:0; width:0%; background:var(--accent); border-radius:3px; transition:width 1.4s cubic-bezier(.2,.7,.2,1);}
+@media (max-width:880px){.steps-row{grid-template-columns:1fr; gap:34px;} .step{border-left:none; padding-left:0; border-top:1px solid rgba(255,255,255,0.14); padding-top:24px;} .step:first-child{border-top:none; padding-top:0;} .steps-band{padding:48px 26px;}}
+
+/* ---------- ADVANTAGES ---------- */
+.adv-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
+.adv-card{
+  background:var(--bg-card-alt); border:1px solid var(--border); border-radius:var(--radius-lg); padding:30px 24px;
+  text-align:left;
+}
+.adv-num{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:2.1rem; color:var(--accent); display:block; margin-bottom:14px;}
+.adv-card h3{margin:0 0 6px; font-size:1rem; color:var(--ink);}
+.adv-note{font-size:0.78rem; color:var(--ink-soft); margin-top:8px;}
+@media (max-width:900px){.adv-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ---------- FIELD ANALYSIS ---------- */
+.field-section{background:var(--bg-card-alt);}
+.flow-diagram{display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:52px;}
+.flow-node{background:#fff; border:1px solid var(--border); border-radius:999px; padding:11px 20px; font-weight:700; font-size:0.88rem; color:var(--primary); box-shadow:var(--shadow-card);}
+.flow-arrow{color:var(--accent); font-weight:700;}
+.field-layout{display:grid; grid-template-columns:1.15fr 0.85fr; gap:28px; align-items:start;}
+.field-map-card{background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow-card);}
+.field-map-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+.field-map-head h4{margin:0; font-size:1rem; color:var(--ink);}
+.legend{display:flex; gap:14px; font-size:0.78rem; color:var(--ink-soft);}
+.legend span{display:inline-flex; align-items:center; gap:5px;}
+.legend i{width:9px; height:9px; border-radius:3px; display:inline-block;}
+#fieldGrid{position:relative; display:grid; gap:5px; }
+.field-cell{aspect-ratio:1; border-radius:5px; cursor:pointer; position:relative; transition:transform .15s;}
+.field-cell:hover{transform:scale(1.08); z-index:2;}
+.field-cell.sample::after{content:""; position:absolute; inset:0; margin:auto; width:7px; height:7px; background:#fff; border-radius:50%; box-shadow:0 0 0 2px rgba(0,0,0,0.25);}
+.field-tooltip{
+  position:absolute; background:var(--primary); color:#fff; padding:12px 14px; border-radius:12px; font-size:0.78rem;
+  pointer-events:none; opacity:0; transform:translateY(6px); transition:opacity .15s, transform .15s; z-index:10; min-width:150px; box-shadow:0 14px 30px -12px rgba(0,0,0,0.5);
+}
+.field-tooltip.show{opacity:1; transform:translateY(0);}
+.field-tooltip b{display:block; margin-bottom:6px; color:var(--accent-light); font-family:'JetBrains Mono',monospace;}
+.field-tooltip div{display:flex; justify-content:space-between; gap:14px; padding:2px 0;}
+.field-note{font-size:0.78rem; color:var(--ink-soft); margin-top:14px;}
+
+.field-stats-split{display:grid; grid-template-columns:1fr 1fr; gap:36px; border-top:1px solid var(--border); margin-top:24px; padding-top:24px;}
+.stats-col h5{margin:0 0 14px; font-size:0.92rem; color:var(--primary); font-weight:800;}
+.stat-row{display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--border); font-size:0.88rem;}
+.stat-row:last-child{border-bottom:none;}
+.stat-row span{color:var(--ink-soft);}
+.stat-row b{font-family:'JetBrains Mono',monospace; font-weight:700;}
+.stat-row b.low{color:var(--danger);}
+.stat-row b.mid{color:#A8791C;}
+.stat-row b.ok{color:#177A5F;}
+.robot-online-pill{display:inline-flex; align-items:center; gap:7px; font-size:0.82rem; font-weight:700; color:#177A5F; background:#E1F3EC; padding:7px 14px; border-radius:999px;}
+.robot-online-pill i{width:7px; height:7px; border-radius:50%; background:#2CA58D; animation:led 1.6s infinite;}
+.field-map-card .progress-track{background:#EFEFE7;}
+.mini-tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:18px;}
+.mini-tile{border-radius:12px; padding:12px; text-align:center; font-weight:700; font-size:0.8rem; font-family:'JetBrains Mono',monospace;}
+.mini-tile span{display:block; font-size:1.05rem; margin-top:4px;}
+.mini-tile.ok{background:#E1F3EC; color:#177A5F;}
+.mini-tile.mid{background:#FCEFD8; color:#A8791C;}
+.mini-tile.low{background:#FBE9E4; color:#B65331;}
+@media (max-width:760px){.field-stats-split{grid-template-columns:1fr; gap:20px;}}
+
+.point-list{display:flex; flex-direction:column; gap:14px;}
+.point-item{background:#fff; border:1px solid var(--border); border-radius:var(--radius-md); padding:16px 18px;}
+.point-item h5{margin:0 0 4px; font-size:0.88rem; color:var(--primary);}
+.point-item p{margin:0; font-size:0.82rem; color:var(--ink-soft);}
+@media (max-width:900px){.field-layout{grid-template-columns:1fr;}}
+
+/* ---------- DASHBOARD ---------- */
+.dash-section{background:var(--dash-bg); color:#fff; border-radius:32px; margin:0 20px; padding:80px 40px;}
+.dash-section .section-head h2{color:#fff;}
+.dash-section .section-head p{color:rgba(255,255,255,0.65);}
+.dash-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;}
+.dash-card{background:var(--dash-card); border:1px solid var(--dash-line); border-radius:var(--radius-lg); padding:22px;}
+.dash-card.span2{grid-column:span 2;}
+.dash-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+.dash-top h4{margin:0; font-size:0.95rem;}
+.status-pill{display:inline-flex; align-items:center; gap:6px; font-size:0.76rem; font-weight:600; color:#4EE0B4;}
+.status-pill i{width:7px; height:7px; border-radius:50%; background:#4EE0B4; animation:led 1.6s infinite;}
+.metric-row{display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--dash-line); font-size:0.86rem;}
+.metric-row:last-child{border-bottom:none;}
+.metric-row span:first-child{color:rgba(255,255,255,0.6);}
+.metric-row b{font-family:'JetBrains Mono',monospace; font-weight:600;}
+.metric-row b.low{color:#E8907A;}
+.metric-row b.mid{color:#E8CB6A;}
+.metric-row b.ok{color:#4EE0B4;}
+.mini-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:4px; margin-top:6px;}
+.mini-cell{aspect-ratio:1; border-radius:3px;}
+.progress-track{height:8px; border-radius:6px; background:var(--dash-line); overflow:hidden; margin-top:8px;}
+.progress-fill{height:100%; border-radius:6px; background:linear-gradient(90deg,var(--accent),#4EE0B4); transition:width .8s ease;}
+.dash-app-frame{
+  width:230px; margin:0 auto; background:#081712; border:6px solid #0A1E17; border-radius:34px; padding:14px 12px; box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
+}
+.dash-app-screen{background:var(--dash-card); border-radius:20px; padding:14px; font-size:0.72rem;}
+@media (max-width:960px){.dash-grid{grid-template-columns:1fr 1fr;} .dash-card.span2{grid-column:span 2;}}
+@media (max-width:640px){.dash-section{margin:0 12px; padding:56px 20px; border-radius:24px;} .dash-grid{grid-template-columns:1fr;} .dash-card.span2{grid-column:span 1;}}
+
+/* ---------- FERTILIZER / CALCULATOR ---------- */
+.fert-layout{display:grid; grid-template-columns:0.95fr 1.05fr; gap:34px; align-items:start;}
+.calc-card{background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); padding:30px; box-shadow:var(--shadow-card);}
+.form-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.field{display:flex; flex-direction:column; gap:6px;}
+.field.full{grid-column:span 2;}
+.field label{font-size:0.82rem; font-weight:700; color:var(--ink);}
+.field select, .field input{
+  border:1.5px solid var(--border); border-radius:10px; padding:11px 13px; font-size:0.92rem; font-family:inherit; background:#fff; color:var(--ink);
+  transition:border-color .2s;
+}
+.field select:focus, .field input:focus{border-color:var(--accent);}
+.field .err{font-size:0.75rem; color:var(--danger); display:none; min-height:16px;}
+.field.invalid select, .field.invalid input{border-color:var(--danger);}
+.field.invalid .err{display:block;}
+.calc-submit{width:100%; margin-top:20px; justify-content:center;}
+
+.result-card{background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px; box-shadow:var(--shadow-card); min-height:420px;}
+.result-empty{display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; height:100%; min-height:380px; color:var(--ink-soft);}
+.result-empty svg{width:52px; height:52px; margin-bottom:16px; opacity:0.5;}
+.result-head{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; gap:10px;}
+.result-head h3{margin:0 0 4px; font-size:1.1rem; color:var(--primary);}
+.result-head p{margin:0; font-size:0.85rem; color:var(--ink-soft);}
+.badge{font-size:0.72rem; font-weight:700; padding:5px 11px; border-radius:999px; white-space:nowrap;}
+.badge.acid{background:#FBE9E4; color:#B65331;}
+.badge.alkaline{background:#FCEFD8; color:#A8791C;}
+.badge.optimal{background:#E1F3EC; color:#177A5F;}
+.bar-row{margin-bottom:12px;}
+.bar-row .lbl{display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;}
+.bar-row .lbl b{font-family:'JetBrains Mono',monospace;}
+.bar-track{height:9px; background:#EFEFE7; border-radius:6px; overflow:hidden;}
+.bar-fill{height:100%; border-radius:6px; transition:width .7s ease;}
+.bar-fill.low{background:var(--danger);}
+.bar-fill.mid{background:var(--sun);}
+.bar-fill.high{background:var(--accent);}
+.reco-list{display:flex; flex-direction:column; gap:10px; margin:18px 0;}
+.reco-item{display:flex; justify-content:space-between; align-items:center; background:var(--bg-card-alt); border:1px solid var(--border); border-radius:12px; padding:13px 16px;}
+.reco-item h5{margin:0 0 2px; font-size:0.88rem;}
+.reco-item span{font-size:0.76rem; color:var(--ink-soft);}
+.need-tag{font-size:0.72rem; font-weight:700; padding:4px 10px; border-radius:999px;}
+.need-tag.high{background:#FBE9E4; color:#B65331;}
+.need-tag.medium{background:#FCEFD8; color:#A8791C;}
+.need-tag.low{background:#E1F3EC; color:#177A5F;}
+.disclaimer{font-size:0.76rem; line-height:1.55; color:var(--ink-soft); background:var(--bg-card-alt); border:1px dashed var(--border); border-radius:10px; padding:12px 14px; margin-top:16px;}
+@media (max-width:960px){.fert-layout{grid-template-columns:1fr;} .form-grid{grid-template-columns:1fr;} .field.full{grid-column:span 1;}}
+
+.analysis-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:8px;}
+.analysis-tile{background:var(--bg-card-alt); border:1px solid var(--border); border-radius:14px; padding:16px 12px; text-align:center;}
+.analysis-tile .lbl{font-size:0.76rem; color:var(--ink-soft);}
+.analysis-tile .val{font-family:'JetBrains Mono',monospace; font-weight:800; font-size:1.3rem; margin:6px 0 6px; color:var(--ink);}
+.analysis-tile .stat-badge{display:inline-block; font-size:0.7rem; font-weight:700; padding:3px 9px; border-radius:999px;}
+.analysis-tile .stat-badge.low{background:#FBE9E4; color:#B65331;}
+.analysis-tile .stat-badge.mid{background:#FCEFD8; color:#A8791C;}
+.analysis-tile .stat-badge.high{background:#E1F3EC; color:#177A5F;}
+@media (max-width:640px){.analysis-grid{grid-template-columns:repeat(2,1fr);}}
+
+.unlock-row{text-align:center; margin-top:22px; padding-top:20px; border-top:1px dashed var(--border);}
+.unlock-row p{font-size:0.82rem; color:var(--ink-soft); margin:0 0 14px;}
+
+.fert-result-wrap{max-width:760px; margin:0 auto;}
+.fert-empty{display:flex; flex-direction:column; align-items:center; text-align:center; gap:14px; padding:56px 30px; border:1px dashed var(--border); border-radius:var(--radius-lg); color:var(--ink-soft); background:var(--bg-card-alt);}
+.fert-empty svg{width:44px; height:44px; opacity:0.5;}
+.fert-card{background:var(--primary); color:#fff; border-radius:var(--radius-lg); padding:36px; box-shadow:var(--shadow-soft);}
+.fert-head{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:22px; padding-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.14);}
+.fert-head h3{margin:0 0 6px; font-size:1.25rem;}
+.fert-head p{margin:0; font-size:0.86rem; color:rgba(255,255,255,0.7);}
+.priority-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:26px;}
+.priority-card{background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.14); border-radius:14px; padding:16px;}
+.priority-card h5{margin:0 0 10px; font-size:0.82rem; color:rgba(255,255,255,0.65); font-weight:600;}
+.priority-tag{font-size:0.78rem; font-weight:700; padding:5px 11px; border-radius:999px; display:inline-block;}
+.priority-tag.high{background:rgba(232,144,122,0.2); color:#F6C3B2;}
+.priority-tag.medium{background:rgba(232,203,106,0.2); color:#F0DA9E;}
+.priority-tag.low{background:rgba(78,224,180,0.2); color:#9BEDD3;}
+.strategy-title{font-size:0.85rem; font-weight:700; margin:0 0 12px;}
+.strategy-list{list-style:none; margin:0 0 20px; padding:0; counter-reset:strategy;}
+.strategy-list li{counter-increment:strategy; display:flex; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1); font-size:0.92rem;}
+.strategy-list li:last-child{border-bottom:none;}
+.strategy-list li::before{content:counter(strategy); width:22px; height:22px; flex-shrink:0; border-radius:50%; background:var(--accent); color:#08251C; font-size:0.75rem; font-weight:800; display:flex; align-items:center; justify-content:center;}
+.fert-warnings{background:rgba(232,144,122,0.14); border:1px solid rgba(232,144,122,0.3); border-radius:12px; padding:14px 16px; font-size:0.84rem; line-height:1.55; margin-bottom:16px; color:#F6D6CB;}
+.fert-disclaimer{font-size:0.78rem; line-height:1.55; color:rgba(255,255,255,0.6); border-top:1px dashed rgba(255,255,255,0.2); padding-top:16px;}
+@media (max-width:760px){.priority-grid{grid-template-columns:1fr;}}
+
+/* ---------- ROBOT PANEL ---------- */
+.robot-panel{background:var(--primary); border-radius:28px; color:#fff; padding:52px 44px; display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center;}
+.robot-info h3{font-size:1.5rem; margin:0 0 4px;}
+.robot-info .rid{color:var(--accent-light); font-family:'JetBrains Mono',monospace; font-size:0.85rem; margin-bottom:22px;}
+.robot-metrics{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:22px 0 26px;}
+.robot-metric b{display:block; font-size:1.5rem; font-family:'JetBrains Mono',monospace; font-weight:700;}
+.robot-metric span{font-size:0.78rem; color:rgba(255,255,255,0.6);}
+.robot-actions{display:flex; gap:12px; flex-wrap:wrap;}
+.robot-mission{display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.09); padding:8px 14px; border-radius:999px; font-size:0.82rem; margin-bottom:6px;}
+.robot-mission i{width:7px; height:7px; border-radius:50%; background:#4EE0B4; animation:led 1.4s infinite;}
+.route-svg{width:100%; height:auto; background:rgba(255,255,255,0.05); border-radius:18px; border:1px solid rgba(255,255,255,0.12);}
+.route-dot{animation:none;}
+@media (max-width:900px){.robot-panel{grid-template-columns:1fr; padding:36px 24px;}}
+
+/* ---------- CHARTS ---------- */
+.charts-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+.chart-card{background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow-card);}
+.chart-card h4{margin:0 0 4px; font-size:0.95rem; color:var(--ink);}
+.chart-card p.sub{margin:0 0 14px; font-size:0.78rem; color:var(--ink-soft);}
+.svg-chart{width:100%; height:200px;}
+.svg-chart svg{width:100%; height:100%; display:block;}
+@media (max-width:900px){.charts-grid{grid-template-columns:1fr;}}
+
+/* ---------- CTA ---------- */
+.cta-section{padding:0;}
+.cta-band{
+  background:linear-gradient(120deg,var(--primary) 0%, var(--accent) 100%); border-radius:32px; margin:0 20px; padding:74px 40px; text-align:center; color:#fff;
+}
+.cta-band h2{font-size:clamp(1.7rem,3.2vw,2.4rem); margin:0 0 16px; letter-spacing:-0.01em;}
+.cta-band p{max-width:560px; margin:0 auto 34px; color:rgba(255,255,255,0.88); font-size:1.02rem; line-height:1.6;}
+.cta-actions{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+.cta-band .btn-ghost{border-color:rgba(255,255,255,0.5);}
+.cta-band .btn-primary{background:#fff; color:var(--primary);}
+.cta-band .btn-primary:hover{background:#EFFAF6;}
+
+/* ---------- FOOTER ---------- */
+footer{padding:60px 0 40px;}
+.footer-inner{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; border-top:1px solid var(--border); padding-top:32px;}
+.footer-links{display:flex; gap:26px; list-style:none; margin:0; padding:0;}
+.footer-links a{text-decoration:none; color:var(--ink-soft); font-size:0.88rem; font-weight:600;}
+.footer-links a:hover{color:var(--primary);}
+.footer-copy{font-size:0.8rem; color:var(--ink-soft);}
+
+/* ---------- MODAL ---------- */
+.modal-overlay{position:fixed; inset:0; background:rgba(14,36,29,0.55); display:none; align-items:center; justify-content:center; z-index:1000; padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff; border-radius:22px; max-width:520px; width:100%; padding:32px; max-height:85vh; overflow:auto; box-shadow:0 40px 80px -30px rgba(0,0,0,0.5); position:relative;}
+.modal h3{margin:0 0 6px; color:var(--primary); font-size:1.3rem;}
+.modal p{color:var(--ink-soft); font-size:0.92rem; line-height:1.6;}
+.modal-close{position:absolute; top:18px; right:18px; background:var(--bg-card-alt); border:none; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:1rem; color:var(--ink-soft);}
+.modal-close:hover{background:var(--border);}
+.doc-item{border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-top:12px;}
+.doc-item h5{margin:0 0 4px; font-size:0.92rem; color:var(--ink);}
+.doc-item p{margin:0; font-size:0.82rem;}
+.login-field{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
+.login-field label{font-size:0.82rem; font-weight:700;}
+.login-field input{border:1.5px solid var(--border); border-radius:10px; padding:11px 13px; font-size:0.92rem;}
+.toast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--primary); color:#fff; padding:14px 22px; border-radius:12px; font-size:0.88rem; font-weight:600; opacity:0; transition:opacity .25s, transform .25s; z-index:2000; box-shadow:0 20px 40px -18px rgba(0,0,0,0.5);}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+@media (max-width:640px){
+  section{padding:70px 0;}
+  .fert-layout, .field-layout{gap:22px;}
+  .cta-band, .robot-panel{margin:0 12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar" id="navbar">
+  <div class="nav-inner">
+    <div class="brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C7 2 4 6 4 10c0 5.5 8 12 8 12s8-6.5 8-12c0-4-3-8-8-8z" fill="white" opacity="0.95"/><circle cx="12" cy="10" r="3" fill="#173B2C"/></svg>
+      </span>
+      SoilScout
+    </div>
+    <ul class="nav-links">
+      <li><a href="#about">Про нас</a></li>
+      <li><a href="#tech">Технологія</a></li>
+      <li><a href="#how">Як це працює</a></li>
+      <li><a href="#features">Можливості</a></li>
+      <li><a href="#docs" id="docsLink">Документація</a></li>
+    </ul>
+    <button class="nav-cta" id="accountBtn">Мій акаунт</button>
+    <button class="hamburger" id="hamburger" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#about">Про нас</a>
+    <a href="#tech">Технологія</a>
+    <a href="#how">Як це працює</a>
+    <a href="#features">Можливості</a>
+    <a href="#docs" id="docsLinkMobile">Документація</a>
+    <button class="nav-cta" id="accountBtnMobile">Мій акаунт</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="about">
+  <div class="hero-field"></div>
+  <div class="hero-vignette"></div>
+  <div class="hero-inner wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow"><span class="dot"></span> Точне землеробство нового покоління</div>
+        <h1>Автономний робот<br>для моніторингу<br>якості ґрунту</h1>
+        <p class="lead">Інноваційне рішення для точного землеробства. Наш робот автоматично збирає фізико-хімічні параметри ґрунту та передає дані для аналізу в реальному часі.</p>
+        <div class="hero-actions">
+          <a href="#tech" class="btn btn-primary">Дізнатись більше →</a>
+          <button class="btn btn-ghost" id="heroAccountBtn">Мій акаунт</button>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><b>5+</b><span>Типів сенсорів</span></div>
+          <div class="hero-stat"><b>24/7</b><span>Моніторинг</span></div>
+          <div class="hero-stat"><b>GPS</b><span>Точність</span></div>
+        </div>
+      </div>
+      <div class="hero-robot">
+        <svg viewBox="0 0 420 380" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="210" cy="345" rx="150" ry="18" fill="black" opacity="0.28"/>
+          <rect x="70" y="150" width="280" height="120" rx="26" fill="#1B4433" stroke="#0E241D" stroke-width="3"/>
+          <rect x="70" y="150" width="280" height="30" rx="10" fill="#25543F"/>
+          <rect x="150" y="120" width="120" height="45" rx="10" fill="#0E241D"/>
+          <circle cx="185" cy="142" r="9" fill="#2CA58D" class="robot-led"/>
+          <circle cx="235" cy="142" r="9" fill="#2CA58D" class="robot-led" style="animation-delay:.4s"/>
+          <rect x="196" y="95" width="6" height="30" fill="#0E241D"/>
+          <circle cx="199" cy="90" r="9" fill="#2CA58D" class="robot-led" style="animation-delay:.2s"/>
+          <circle cx="120" cy="285" r="46" fill="#0E241D"/>
+          <circle cx="120" cy="285" r="46" fill="none" stroke="#2CA58D" stroke-width="4" opacity="0.5"/>
+          <circle cx="120" cy="285" r="14" fill="#25543F"/>
+          <circle cx="300" cy="285" r="46" fill="#0E241D"/>
+          <circle cx="300" cy="285" r="46" fill="none" stroke="#2CA58D" stroke-width="4" opacity="0.5"/>
+          <circle cx="300" cy="285" r="14" fill="#25543F"/>
+          <rect x="200" y="260" width="8" height="60" fill="#173B2C" stroke="#0E241D" stroke-width="2"/>
+          <g class="robot-scan">
+            <line x1="204" y1="260" x2="204" y2="340" stroke="#2CA58D" stroke-width="3" stroke-dasharray="4 4"/>
+          </g>
+          <rect x="140" y="185" width="140" height="42" rx="8" fill="#0E241D" opacity="0.5"/>
+          <rect x="150" y="195" width="30" height="22" rx="4" fill="#2CA58D" opacity="0.85"/>
+          <rect x="190" y="195" width="30" height="22" rx="4" fill="#4EE0B4" opacity="0.7"/>
+          <rect x="230" y="195" width="30" height="22" rx="4" fill="#2CA58D" opacity="0.55"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SENSOR SYSTEM -->
+<section id="tech">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <p class="eyebrow-tag">Сенсорна система</p>
+      <h2>Комплексний аналіз ґрунту</h2>
+      <p>Наш робот оснащений передовими сенсорами для вимірювання ключових фізико-хімічних параметрів ґрунту</p>
+    </div>
+    <div class="sensor-grid">
+      <div class="sensor-card reveal">
+        <div class="sensor-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2c3 5 7 9 7 13a7 7 0 1 1-14 0c0-4 4-8 7-13z"/></svg></div>
+        <h3>Вологість</h3>
+        <p>Точне вимірювання вмісту вологи у ґрунті на різних глибинах</p>
+      </div>
+      <div class="sensor-card reveal">
+        <div class="sensor-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg></div>
+        <h3>Температура</h3>
+        <p>Моніторинг температури ґрунту для оптимального росту рослин</p>
+      </div>
+      <div class="sensor-card reveal">
+        <div class="sensor-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3h6l1 4-4 3-4-3 1-4z"/><path d="M6 21c0-4 2.5-6 6-6s6 2 6 6"/></svg></div>
+        <h3>Кислотність (pH)</h3>
+        <p>Аналіз рівня pH для визначення придатності ґрунту</p>
+      </div>
+      <div class="sensor-card reveal">
+        <div class="sensor-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h4l2-7 4 14 2-7h4"/></svg></div>
+        <h3>Електропровідність</h3>
+        <p>Вимірювання EC для оцінки вмісту солей та мінералів</p>
+      </div>
+      <div class="sensor-card reveal">
+        <div class="sensor-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <h3>NPK Елементи</h3>
+        <p>Визначення вмісту азоту, фосфору та калію в ґрунті</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <p class="eyebrow-tag">Процес</p>
+      <h2>Як це працює</h2>
+    </div>
+    <div class="steps-band reveal" id="stepsBand">
+      <div class="steps-track"><div class="steps-track-fill" id="stepsFill"></div></div>
+      <div class="steps-row">
+        <div class="step"><span class="step-num">01</span><h3>Автономна навігація</h3><p>Робот самостійно переміщується полем за допомогою GPS та датчиків навігації</p></div>
+        <div class="step"><span class="step-num">02</span><h3>Збір даних</h3><p>Сенсори занурюються в ґрунт та вимірюють всі ключові параметри</p></div>
+        <div class="step"><span class="step-num">03</span><h3>Передача у хмару</h3><p>Дані миттєво передаються до інформаційної системи через бездротовий зв'язок</p></div>
+        <div class="step"><span class="step-num">04</span><h3>Аналіз та рекомендації</h3><p>Система аналізує дані та формує персоналізовані рекомендації для агронома</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADVANTAGES -->
+<section id="features">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <p class="eyebrow-tag">Переваги</p>
+      <h2>Чому обрати наше рішення</h2>
+      <p>Інтелектуальний моніторинг ґрунту для сучасного аграрного бізнесу</p>
+    </div>
+    <div class="adv-grid">
+      <div class="adv-card reveal"><span class="adv-num">+30%</span><h3>Підвищення врожайності</h3><span class="adv-note">Заявлена ціль на основі пілотних господарств</span></div>
+      <div class="adv-card reveal"><span class="adv-num">10x</span><h3>Економія часу</h3><span class="adv-note">Порівняно з ручним відбором проб</span></div>
+      <div class="adv-card reveal"><span class="adv-num">GPS</span><h3>Точне землеробство</h3><span class="adv-note">Прив'язка кожної проби до координат</span></div>
+      <div class="adv-card reveal"><span class="adv-num">ECO</span><h3>Збереження довкілля</h3><span class="adv-note">Менше надлишкового внесення добрив</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MONITORING -->
+<section class="field-section" id="field">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <p class="eyebrow-tag">Моніторинг поля</p>
+      <h2>Моніторинг вашого поля</h2>
+      <p>Карта поля, стан робота та ключові показники ґрунту — в одному місці, оновлюється в реальному часі</p>
+    </div>
+    <div class="flow-diagram reveal">
+      <div class="flow-node">Поле</div><div class="flow-arrow">→</div>
+      <div class="flow-node">Робот</div><div class="flow-arrow">→</div>
+      <div class="flow-node">Сенсори</div><div class="flow-arrow">→</div>
+      <div class="flow-node">Аналіз</div><div class="flow-arrow">→</div>
+      <div class="flow-node">Рекомендація</div>
+    </div>
+    <div class="field-map-card reveal">
+      <div class="field-map-head">
+        <h4>Карта поля №1 · 76 га</h4>
+        <div class="legend">
+          <span><i style="background:#2CA58D"></i>Норма</span>
+          <span><i style="background:#E8B84B"></i>Увага</span>
+          <span><i style="background:#C7654B"></i>Дефіцит</span>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div id="fieldGrid"></div>
+        <div class="field-tooltip" id="fieldTooltip"></div>
+      </div>
+      <p class="field-note">Наведіть курсор на точку відбору проби, щоб побачити виміряні параметри. Білі крапки — точки, де робот здійснив вимірювання; пунктирна лінія показує маршрут робота.</p>
+
+      <div class="field-stats-split">
+        <div class="stats-col">
+          <h5>Поле №1 · 76 га</h5>
+          <div class="stat-row"><span>Вологість</span><b class="ok">68%</b></div>
+          <div class="stat-row"><span>pH</span><b class="ok">6.4</b></div>
+          <div class="stat-row"><span>Азот (N)</span><b class="mid">82 mg/kg</b></div>
+          <div class="stat-row"><span>Фосфор (P)</span><b class="low">38 mg/kg</b></div>
+          <div class="stat-row"><span>Калій (K)</span><b class="ok">145 mg/kg</b></div>
+        </div>
+        <div class="stats-col">
+          <h5>Статус</h5>
+          <div class="robot-online-pill"><i></i>Робот онлайн</div>
+          <div class="progress-track" style="margin-top:18px;"><div class="progress-fill" style="width:78%"></div></div>
+          <div class="stat-row" style="border:none;"><span>Загальний індекс ґрунту</span><b class="ok">78%</b></div>
+          <div class="mini-tiles">
+            <div class="mini-tile mid">N<span>82</span></div>
+            <div class="mini-tile low">P<span>38</span></div>
+            <div class="mini-tile ok">K<span>145</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOIL ANALYSIS -->
+<section id="analysis">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <p class="eyebrow-tag">Аналіз ґрунту</p>
+      <h2>Проаналізуйте показники вашого поля</h2>
+      <p>Введіть дані з робота або лабораторного аналізу — результат з'явиться одразу на сторінці, без перезавантаження</p>
+    </div>
+    <div class="fert-layout">
+      <div class="calc-card reveal">
+        <form id="soilForm" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="crop">Культура</label>
+              <select id="crop">
+                <option value="Пшениця">Пшениця</option>
+                <option value="Кукурудза">Кукурудза</option>
+                <option value="Соняшник">Соняшник</option>
+                <option value="Ріпак">Ріпак</option>
+                <option value="Соя">Соя</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="soilType">Тип ґрунту</label>
+              <select id="soilType">
+                <option>Чорнозем</option>
+                <option>Суглинок</option>
+                <option>Супісок</option>
+                <option>Глина</option>
+                <option>Піщаний</option>
+              </select>
+            </div>
+            <div class="field" id="areaField">
+              <label for="area">Площа поля, га</label>
+              <input type="number" id="area" min="0.1" step="0.1" placeholder="76">
+              <span class="err">Вкажіть площу більшу за 0</span>
+            </div>
+            <div class="field" id="phField">
+              <label for="ph">pH ґрунту</label>
+              <input type="number" id="ph" min="3" max="10" step="0.1" placeholder="6.4">
+              <span class="err">pH має бути в діапазоні 3–10</span>
+            </div>
+            <div class="field" id="nField">
+              <label for="nitrogen">Азот (N), mg/kg</label>
+              <input type="number" id="nitrogen" min="0" step="1" placeholder="82">
+              <span class="err">Вкажіть значення від 0 і вище</span>
+            </div>
+            <div class="field" id="pField">
+              <label for="phosphorus">Фосфор (P), mg/kg</label>
+              <input type="number" id="phosphorus" min="0" step="1" placeholder="38">
+              <span class="err">Вкажіть значення від 0 і вище</span>
+            </div>
+            <div class="field" id="kField">
+              <label for="potassium">Калій (K), mg/kg</label>
+              <input type="number" id="potassium" min="0" step="1" placeholder="145">
+              <span class="err">Вкажіть значення від 0 і вище</span>
+            </div>
+            <div class="field" id="moistureField">
+              <label for="moisture">Вологість, %</label>
+              <input type="number" id="moisture" min="0" max="100" step="1" placeholder="68">
+              <span class="err">Вкажіть значення від 0 до 100</span>
+            </div>
+            <div class="field full" id="temperatureField">
+              <label for="temperature">Температура ґрунту, °C</label>
+              <input type="number" id="temperature" min="-10" max="45" step="1" placeholder="17">
+              <span class="err">Вкажіть значення від -10 до 45</span>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-dark calc-submit" id="analyzeBtn">Проаналізувати ґрунт</button>
+        </form>
+      </div>
+
+      <div class="result-card reveal" id="resultCard">
+        <div class="result-empty" id="resultEmpty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v5l3 2"/></svg>
+          <p>Заповніть форму зліва та натисніть «Проаналізувати ґрунт», щоб побачити результат аналізу.</p>
+        </div>
+        <div id="resultBody" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FERTILIZER RECOMMENDATION -->
+<section id="fertilizer">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <p class="eyebrow-tag">Розумний підбір добрив</p>
+      <h2>Розумний підбір добрив</h2>
+      <p>Система аналізує показники ґрунту, культуру та параметри поля для формування демонстраційної рекомендації</p>
+    </div>
+    <div class="fert-result-wrap reveal">
+      <div class="fert-empty" id="fertEmpty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2c3 5 7 9 7 13a7 7 0 1 1-14 0c0-4 4-8 7-13z"/></svg>
+        <p>Спочатку виконайте «Аналіз ґрунту» вище, а потім натисніть «Підібрати добриво →», щоб отримати рекомендацію.</p>
+      </div>
+      <div id="fertBody" style="display:none;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHARTS -->
+<section id="charts">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <p class="eyebrow-tag">Динаміка</p>
+      <h2>Показники в динаміці</h2>
+      <p>Демонстраційні дані з робота за тиждень та по точках відбору проб</p>
+    </div>
+    <div class="charts-grid reveal">
+      <div class="chart-card">
+        <h4>Вологість ґрунту за 7 днів</h4>
+        <p class="sub">%, дані з робота, поле №1</p>
+        <div class="svg-chart" id="moistureChart"></div>
+      </div>
+      <div class="chart-card">
+        <h4>Температура ґрунту за 7 днів</h4>
+        <p class="sub">°C, дані з робота, поле №1</p>
+        <div class="svg-chart" id="tempChart"></div>
+      </div>
+      <div class="chart-card">
+        <h4>pH по ділянках</h4>
+        <p class="sub">Точки відбору проб №1–6</p>
+        <div class="svg-chart" id="phChart"></div>
+      </div>
+      <div class="chart-card">
+        <h4>NPK — поточний баланс</h4>
+        <p class="sub">mg/kg по ділянці</p>
+        <div class="svg-chart" id="npkChart"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROBOT PANEL -->
+<section id="robot">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <p class="eyebrow-tag">Панель робота</p>
+      <h2>Мій робот</h2>
+    </div>
+    <div class="robot-panel reveal">
+      <div class="robot-info">
+        <div class="robot-mission"><i></i> Робот збирає дані...</div>
+        <h3>GruntBot #4711-X</h3>
+        <div class="rid">Статус: <span id="robotStatus">Онлайн</span> · Місія: «Сканування поля»</div>
+        <div class="robot-metrics">
+          <div class="robot-metric"><b id="robotCharge">76%</b><span>Заряд</span></div>
+          <div class="robot-metric"><b>3.2 га</b><span>Оброблено</span></div>
+          <div class="robot-metric"><b>2 год</b><span>Час роботи</span></div>
+        </div>
+        <div class="robot-actions">
+          <button class="btn btn-primary" id="connectBtn">Підключитись</button>
+          <a href="#field" class="btn btn-ghost" style="color:var(--primary); background:rgba(23,59,44,0.08); border-color:rgba(23,59,44,0.2);">На карту</a>
+          <button class="btn btn-ghost" id="robotDetailsBtn">Деталі</button>
+        </div>
+      </div>
+      <div>
+        <svg class="route-svg" viewBox="0 0 400 240">
+          <rect width="400" height="240" rx="16" fill="none"/>
+          <path id="routePath" d="M30,200 L100,190 L110,120 L200,110 L210,40 L320,50 L330,140 L370,150" fill="none" stroke="#2CA58D" stroke-width="2.5" stroke-dasharray="6 6" opacity="0.7"/>
+          <circle id="routeDot" r="7" fill="#4EE0B4"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-band reveal">
+    <h2>Готові оптимізувати ваше господарство?</h2>
+    <p>Зв'яжіться з нами для детальної консультації та демонстрації можливостей агроробота</p>
+    <div class="cta-actions">
+      <button class="btn btn-primary" id="ctaConsultBtn">Замовити консультацію</button>
+      <button class="btn btn-ghost" id="ctaDocsBtn">Технічна документація →</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="brand" style="font-size:1.05rem;">
+        <span class="brand-mark" style="width:28px; height:28px;"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C7 2 4 6 4 10c0 5.5 8 12 8 12s8-6.5 8-12c0-4-3-8-8-8z" fill="white" opacity="0.95"/><circle cx="12" cy="10" r="3" fill="#173B2C"/></svg></span>
+        SoilScout
+      </div>
+      <ul class="footer-links">
+        <li><a href="#about">Про нас</a></li>
+        <li><a href="#" id="footerContact">Контакти</a></li>
+        <li><a href="#" id="footerDocs">Документація</a></li>
+      </ul>
+      <div class="footer-copy">© 2025 SoilScout. Інноваційні технології для сталого землеробства.</div>
+    </div>
+  </div>
+</footer>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="accountModal">
+  <div class="modal">
+    <button class="modal-close" data-close>✕</button>
+    <h3>Мій акаунт</h3>
+    <p>Демонстраційний вхід у панель фермера. Введіть будь-які дані — реальна автентифікація ще не підключена.</p>
+    <div class="login-field"><label>Email</label><input type="email" placeholder="you@farm.ua" id="loginEmail"></div>
+    <div class="login-field"><label>Пароль</label><input type="password" placeholder="••••••••" id="loginPass"></div>
+    <button class="btn btn-dark" style="width:100%; justify-content:center;" id="loginSubmit">Увійти до панелі</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="docsModal">
+  <div class="modal">
+    <button class="modal-close" data-close>✕</button>
+    <h3>Технічна документація</h3>
+    <p>Огляд ключових технічних матеріалів SoilScout.</p>
+    <div class="doc-item"><h5>Специфікація сенсорів</h5><p>Діапазони вимірювання вологості, pH, EC, температури та NPK, глибина занурення зондів.</p></div>
+    <div class="doc-item"><h5>API передачі даних</h5><p>Формат пакетів телеметрії, частота передачі, протокол зв'язку робота з хмарою.</p></div>
+    <div class="doc-item"><h5>Recommendation engine</h5><p>Опис демонстраційного алгоритму формування рекомендацій щодо добрив на основі порогових значень.</p></div>
+    <div class="doc-item"><h5>Безпека та автономність</h5><p>Правила навігації полем, зупинка при перешкодах, GPS-точність.</p></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="robotDetailsModal">
+  <div class="modal">
+    <button class="modal-close" data-close>✕</button>
+    <h3>GruntBot #4711-X — деталі</h3>
+    <p>Поточна місія та стан систем робота в реальному часі.</p>
+    <div class="doc-item"><h5>Місія</h5><p>Сканування поля №1 — етап 3 з 5, зона «Північний сектор».</p></div>
+    <div class="doc-item"><h5>Заряд батареї</h5><p>76% · орієнтовний запас ходу ще ≈ 3 год роботи.</p></div>
+    <div class="doc-item"><h5>Сенсори</h5><p>Усі 5 сенсорів активні: вологість, температура, pH, EC, NPK.</p></div>
+    <div class="doc-item"><h5>Зв'язок</h5><p>Бездротове з'єднання стабільне, останнє оновлення даних — щойно.</p></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- UTIL ---------------- */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=> t.classList.remove('show'), 2600);
+}
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(el){ el.classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(ov=>{
+  ov.addEventListener('click', e=>{ if(e.target===ov) closeModal(ov); });
+});
+document.querySelectorAll('[data-close]').forEach(btn=>{
+  btn.addEventListener('click', ()=> closeModal(btn.closest('.modal-overlay')));
+});
+
+/* ---------------- NAVBAR ---------------- */
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', ()=>{
+  navbar.classList.toggle('scrolled', window.scrollY > 8);
+});
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', ()=> mobileMenu.classList.toggle('open'));
+mobileMenu.querySelectorAll('a').forEach(a=> a.addEventListener('click', ()=> mobileMenu.classList.remove('open')));
+
+['accountBtn','accountBtnMobile','heroAccountBtn'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('click', ()=> openModal('accountModal'));
+});
+document.getElementById('loginSubmit').addEventListener('click', ()=>{
+  closeModal(document.getElementById('accountModal'));
+  showToast('Вхід виконано — ось панель вашого поля');
+  document.getElementById('field').scrollIntoView({behavior:'smooth'});
+});
+
+['docsLink','docsLinkMobile','ctaDocsBtn','footerDocs'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('click', (e)=>{ e.preventDefault(); openModal('docsModal'); });
+});
+document.getElementById('ctaConsultBtn').addEventListener('click', ()=>{
+  showToast("Заявку прийнято — ми зв'яжемось з вами найближчим часом");
+});
+const footerContact = document.getElementById('footerContact');
+if(footerContact) footerContact.addEventListener('click', (e)=>{ e.preventDefault(); showToast('contact@soilscout.ua · +380 (00) 000-00-00'); });
+
+/* ---------------- SCROLL REVEAL ---------------- */
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      en.target.classList.add('in');
+      if(en.target.id === 'stepsBand'){
+        requestAnimationFrame(()=> document.getElementById('stepsFill').style.width = '100%');
+      }
+      io.unobserve(en.target);
+    }
+  });
+}, {threshold:0.18});
+revealEls.forEach(el=> io.observe(el));
+
+/* ---------------- FIELD MAP ---------------- */
+const COLS = 10, ROWS = 6;
+const grid = document.getElementById('fieldGrid');
+grid.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
+const tooltip = document.getElementById('fieldTooltip');
+
+// deterministic pseudo-random field
+function seeded(i){ const x = Math.sin(i*999)*10000; return x - Math.floor(x); }
+const cellData = [];
+for(let i=0;i<COLS*ROWS;i++){
+  const r = seeded(i+1);
+  let status;
+  if(r < 0.58) status = 'ok';
+  else if(r < 0.82) status = 'mid';
+  else status = 'low';
+  cellData.push({
+    status,
+    moisture: Math.round(45 + seeded(i+11)*35),
+    ph: (5.4 + seeded(i+21)*2.4).toFixed(1),
+    n: Math.round(35 + seeded(i+31)*90),
+    p: Math.round(15 + seeded(i+41)*45),
+    k: Math.round(90 + seeded(i+51)*100)
+  });
+}
+const colorMap = {ok:'#2CA58D', mid:'#E8B84B', low:'#C7654B'};
+const sampleIdx = [7, 14, 23, 31, 40, 48];
+cellData.forEach((c, i)=>{
+  const div = document.createElement('div');
+  div.className = 'field-cell' + (sampleIdx.includes(i) ? ' sample' : '');
+  div.style.background = colorMap[c.status];
+  div.dataset.idx = i;
+  div.addEventListener('mouseenter', (e)=>{
+    tooltip.innerHTML = `<b>Точка #${i+1}</b>
+      <div><span>Вологість</span><span>${c.moisture}%</span></div>
+      <div><span>pH</span><span>${c.ph}</span></div>
+      <div><span>N</span><span>${c.n} mg/kg</span></div>
+      <div><span>P</span><span>${c.p} mg/kg</span></div>
+      <div><span>K</span><span>${c.k} mg/kg</span></div>`;
+    const rect = div.getBoundingClientRect();
+    const parentRect = grid.parentElement.getBoundingClientRect();
+    tooltip.style.left = Math.min(rect.left - parentRect.left, parentRect.width - 170) + 'px';
+    tooltip.style.top = (rect.top - parentRect.top - 10) + 'px';
+    tooltip.classList.add('show');
+  });
+  div.addEventListener('mouseleave', ()=> tooltip.classList.remove('show'));
+  grid.appendChild(div);
+});
+
+/* ---------------- ROUTE ANIMATION ---------------- */
+(function animateRoute(){
+  const path = document.getElementById('routePath');
+  const dot = document.getElementById('routeDot');
+  const len = path.getTotalLength();
+  let t = 0;
+  function step(){
+    t += 0.0026;
+    if(t > 1) t = 0;
+    const pt = path.getPointAtLength(t*len);
+    dot.setAttribute('cx', pt.x);
+    dot.setAttribute('cy', pt.y);
+    requestAnimationFrame(step);
+  }
+  step();
+})();
+
+/* ---------------- ROBOT PANEL ---------------- */
+let connected = false;
+document.getElementById('connectBtn').addEventListener('click', function(){
+  connected = !connected;
+  this.textContent = connected ? "Від'єднати" : 'Підключитись';
+  document.getElementById('robotStatus').textContent = connected ? 'Підключено (пряме керування)' : 'Онлайн';
+  showToast(connected ? "З'єднання з роботом встановлено" : "З'єднання розірвано");
+});
+document.getElementById('robotDetailsBtn').addEventListener('click', ()=> openModal('robotDetailsModal'));
+
+/* ---------------- RECOMMENDATION ENGINE ----------------
+   generateFertilizerRecommendation() — детерміновано, без випадкових значень.
+   Приймає: crop, area, soilType, ph, nitrogen, phosphorus, potassium, moisture, temperature
+   Повертає: soilStatus, nitrogenStatus, phosphorusStatus, potassiumStatus, recommendations, warnings
+*/
+function generateFertilizerRecommendation({crop, area, soilType, ph, nitrogen, phosphorus, potassium, moisture, temperature}){
+  const status = (v, low, high) => v < low ? 'low' : (v < high ? 'mid' : 'high');
+  const nitrogenStatus = status(nitrogen, 60, 100);
+  const phosphorusStatus = status(phosphorus, 30, 50);
+  const potassiumStatus = status(potassium, 120, 180);
+
+  let soilStatus = 'optimal';
+  if(ph < 5.5) soilStatus = 'acid';
+  else if(ph > 7.5) soilStatus = 'alkaline';
+
+  let moistureStatus = 'optimal';
+  if(moisture < 30) moistureStatus = 'low';
+  else if(moisture > 75) moistureStatus = 'over';
+
+  const needFromStatus = s => s === 'low' ? 'high' : (s === 'mid' ? 'medium' : 'low');
+
+  const recommendations = [
+    {name:'Азотне живлення', need: needFromStatus(nitrogenStatus), key:'nitrogen'},
+    {name:'Фосфорне живлення', need: needFromStatus(phosphorusStatus), key:'phosphorus'},
+    {name:'Калійне живлення', need: needFromStatus(potassiumStatus), key:'potassium'},
+  ].sort((a,b)=>{
+    const order = {high:0, medium:1, low:2};
+    return order[a.need]-order[b.need];
+  });
+
+  const warnings = [];
+  if(ph < 5.5) warnings.push('Необхідно звернути увагу на кислотність ґрунту — розгляньте вапнування перед основним підживленням.');
+  if(ph > 7.5) warnings.push('Необхідно звернути увагу на лужність ґрунту — засвоюваність деяких мікроелементів може бути знижена.');
+  if(moisture < 30) warnings.push('Низька вологість ґрунту — рекомендовано збільшити частоту поливу.');
+  if(moisture > 75) warnings.push('Висока вологість — перевірте дренаж ділянки.');
+  if(typeof temperature === 'number'){
+    if(temperature < 8) warnings.push('Низька температура ґрунту може уповільнювати біологічну активність і засвоєння поживних речовин.');
+    if(temperature > 32) warnings.push('Висока температура ґрунту — контролюйте вологість, щоб уникнути теплового стресу рослин.');
+  }
+
+  return {soilStatus, nitrogenStatus, phosphorusStatus, potassiumStatus, moistureStatus, recommendations, warnings, crop, area, soilType};
+}
+
+const nutrientStatusLabel = {low:'Низький', mid:'Середній', high:'Оптимальний'};
+const nutrientBadgeClass = {low:'low', mid:'mid', high:'high'};
+const moistureStatusLabel = {low:'Низька', optimal:'Оптимальна', over:'Висока'};
+const moistureBadgeClass = {low:'low', optimal:'high', over:'mid'};
+const phStatusLabel = {acid:'Кислий', alkaline:'Лужний', optimal:'Оптимальний'};
+const phBadgeClass = {acid:'low', alkaline:'mid', optimal:'high'};
+const needPriorityLabel = {high:'Високий пріоритет', medium:'Середній пріоритет', low:'Низький пріоритет'};
+const needTagClass = {high:'high', medium:'medium', low:'low'};
+
+function barClass(s){ return s === 'low' ? 'low' : (s === 'mid' ? 'mid' : 'high'); }
+function barPct(v, max){ return Math.max(6, Math.min(100, Math.round(v/max*100))); }
+
+const form = document.getElementById('soilForm');
+const fieldIds = ['area','ph','nitrogen','phosphorus','potassium','moisture','temperature'];
+const fieldWrap = {area:'areaField', ph:'phField', nitrogen:'nField', phosphorus:'pField', potassium:'kField', moisture:'moistureField', temperature:'temperatureField'};
+
+let lastAnalysis = null; // зберігає {crop, area, soilType, vals, result} для кроку 2 — підбору добрив
+
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+  let valid = true;
+  const vals = {};
+  fieldIds.forEach(id=>{
+    const input = document.getElementById(id);
+    const wrap = document.getElementById(fieldWrap[id]);
+    const v = parseFloat(input.value);
+    let ok = !isNaN(v);
+    if(id === 'ph') ok = ok && v >= 3 && v <= 10;
+    if(id === 'moisture') ok = ok && v >= 0 && v <= 100;
+    if(id === 'temperature') ok = ok && v >= -10 && v <= 45;
+    if(id === 'area') ok = ok && v > 0;
+    if(['nitrogen','phosphorus','potassium'].includes(id)) ok = ok && v >= 0;
+    wrap.classList.toggle('invalid', !ok);
+    if(!ok) valid = false;
+    vals[id] = v;
+  });
+  if(!valid){ showToast('Перевірте виділені поля форми'); return; }
+
+  const crop = document.getElementById('crop').value;
+  const soilType = document.getElementById('soilType').value;
+  const result = generateFertilizerRecommendation({crop, area:vals.area, soilType, ph:vals.ph, nitrogen:vals.nitrogen, phosphorus:vals.phosphorus, potassium:vals.potassium, moisture:vals.moisture, temperature:vals.temperature});
+
+  lastAnalysis = {crop, area:vals.area, soilType, vals, result};
+
+  document.getElementById('resultEmpty').style.display = 'none';
+  const body = document.getElementById('resultBody');
+  body.style.display = 'block';
+
+  const tile = (lbl, val, badgeClass, badgeText) => `
+    <div class="analysis-tile">
+      <div class="lbl">${lbl}</div>
+      <div class="val">${val}</div>
+      <span class="stat-badge ${badgeClass}">${badgeText}</span>
+    </div>`;
+
+  body.innerHTML = `
+    <div class="result-head">
+      <div>
+        <h3>Результат аналізу</h3>
+        <p>${crop} · ${vals.area} га · ${soilType}</p>
+      </div>
+    </div>
+    <div class="analysis-grid">
+      ${tile('pH', vals.ph, phBadgeClass[result.soilStatus], phStatusLabel[result.soilStatus])}
+      ${tile('Азот (N)', vals.nitrogen + ' mg/kg', nutrientBadgeClass[result.nitrogenStatus], nutrientStatusLabel[result.nitrogenStatus])}
+      ${tile('Фосфор (P)', vals.phosphorus + ' mg/kg', nutrientBadgeClass[result.phosphorusStatus], nutrientStatusLabel[result.phosphorusStatus])}
+      ${tile('Калій (K)', vals.potassium + ' mg/kg', nutrientBadgeClass[result.potassiumStatus], nutrientStatusLabel[result.potassiumStatus])}
+      ${tile('Вологість', vals.moisture + '%', moistureBadgeClass[result.moistureStatus], moistureStatusLabel[result.moistureStatus])}
+      ${tile('Температура', vals.temperature + '°C', 'high', 'Виміряно')}
+    </div>
+    <div class="unlock-row">
+      <p>Дані проаналізовано. Сформувати рекомендацію щодо добрив на основі цих показників?</p>
+      <button type="button" class="btn btn-primary" id="unlockFertBtn">Підібрати добриво →</button>
+    </div>
+  `;
+
+  document.getElementById('unlockFertBtn').addEventListener('click', renderFertilizerRecommendation);
+  body.scrollIntoView({behavior:'smooth', block:'nearest'});
+});
+
+function renderFertilizerRecommendation(){
+  if(!lastAnalysis) return;
+  const {crop, area, soilType, result} = lastAnalysis;
+
+  const priorityCards = result.recommendations.map(r=>`
+    <div class="priority-card">
+      <h5>${r.name.replace('живлення','').trim()}</h5>
+      <span class="priority-tag ${needTagClass[r.need]}">${needPriorityLabel[r.need]}</span>
+    </div>`).join('');
+
+  const strategyItems = result.recommendations.filter(r=>r.need !== 'low');
+  const strategyHtml = strategyItems.length
+    ? strategyItems.map(r=>`<li>${r.name}</li>`).join('')
+    : `<li>Суттєвих дефіцитів не виявлено — підтримуйте поточний режим підживлення</li>`;
+
+  const warnHtml = result.warnings.length
+    ? `<div class="fert-warnings">${result.warnings.join('<br>')}</div>`
+    : '';
+
+  document.getElementById('fertEmpty').style.display = 'none';
+  const fertBody = document.getElementById('fertBody');
+  fertBody.style.display = 'block';
+  fertBody.innerHTML = `
+    <div class="fert-card">
+      <div class="fert-head">
+        <div>
+          <h3>🌱 Рекомендація для поля №1</h3>
+          <p>${crop} · ${area} га · ${soilType}</p>
+        </div>
+        <span class="badge ${result.soilStatus}">Ґрунт: ${phStatusLabel[result.soilStatus]}</span>
+      </div>
+      <div class="priority-grid">${priorityCards}</div>
+      <p class="strategy-title">Рекомендована стратегія</p>
+      <ol class="strategy-list">${strategyHtml}</ol>
+      ${warnHtml}
+      <div class="fert-disclaimer">Демонстраційна рекомендація. Остаточні норми внесення мають визначатися агрономом на основі лабораторного аналізу, культури, ґрунту та локальних агрономічних норм.</div>
+    </div>
+  `;
+  document.getElementById('fertilizer').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* prefill demo values */
+document.getElementById('area').value = 76;
+document.getElementById('ph').value = 6.4;
+document.getElementById('nitrogen').value = 82;
+document.getElementById('phosphorus').value = 38;
+document.getElementById('potassium').value = 145;
+document.getElementById('moisture').value = 68;
+document.getElementById('temperature').value = 17;
+
+/* ---------------- CHARTS (чистий SVG, без сторонніх бібліотек) ---------------- */
+function renderLineChart(id, labels, data, color, unit){
+  const w = 520, h = 200, padL = 30, padR = 12, padT = 22, padB = 26;
+  const min = Math.min(...data), max = Math.max(...data);
+  const span = (max - min) || 1;
+  const lo = min - span * 0.25, hi = max + span * 0.25;
+  const x = i => padL + (i/(data.length-1)) * (w-padL-padR);
+  const y = v => padT + (1 - ((v-lo)/(hi-lo))) * (h-padT-padB);
+  const pts = data.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+  const area = `${padL},${h-padB} ${pts} ${x(data.length-1)},${h-padB}`;
+  const grid = [0,0.5,1].map(f=>{
+    const yy = padT + f*(h-padT-padB);
+    return `<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${w-padR}" y2="${yy.toFixed(1)}" stroke="#EFEFE7" stroke-width="1"/>`;
+  }).join('');
+  const dots = data.map((v,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3.5" fill="${color}"/>`).join('');
+  const xLabels = labels.map((l,i)=>`<text x="${x(i).toFixed(1)}" y="${h-6}" font-size="10" fill="#5B6459" text-anchor="middle">${l}</text>`).join('');
+  const vLabels = data.map((v,i)=>`<text x="${x(i).toFixed(1)}" y="${(y(v)-9).toFixed(1)}" font-size="10" fill="${color}" font-weight="700" text-anchor="middle" font-family="JetBrains Mono, monospace">${v}${unit}</text>`).join('');
+  document.getElementById(id).innerHTML = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    ${grid}
+    <polygon points="${area}" fill="${color}" opacity="0.12"/>
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}${vLabels}${xLabels}
+  </svg>`;
+}
+
+function renderBarChart(id, labels, data, colors, unit){
+  const w = 520, h = 200, padL = 26, padR = 12, padT = 24, padB = 26;
+  const max = Math.max(...data) * 1.2;
+  const slot = (w-padL-padR)/data.length;
+  const bw = slot * 0.5;
+  const bars = data.map((v,i)=>{
+    const bh = (v/max) * (h-padT-padB);
+    const bx = padL + i*slot + (slot-bw)/2;
+    const by = h-padB-bh;
+    const c = Array.isArray(colors) ? colors[i] : colors;
+    return `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="6" fill="${c}"/>
+      <text x="${(bx+bw/2).toFixed(1)}" y="${(by-8).toFixed(1)}" font-size="10" text-anchor="middle" fill="${c}" font-weight="700" font-family="JetBrains Mono, monospace">${v}${unit}</text>
+      <text x="${(bx+bw/2).toFixed(1)}" y="${h-6}" font-size="10" text-anchor="middle" fill="#5B6459">${labels[i]}</text>`;
+  }).join('');
+  document.getElementById(id).innerHTML = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <line x1="${padL}" y1="${h-padB}" x2="${w-padR}" y2="${h-padB}" stroke="#E4E4DA" stroke-width="1"/>
+    ${bars}
+  </svg>`;
+}
+
+const weekLabels = ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+renderLineChart('moistureChart', weekLabels, [61,64,66,63,68,70,68], '#2CA58D', '%');
+renderLineChart('tempChart', weekLabels, [14,15,17,16,18,19,17], '#E8B84B', '°');
+
+const plotLabels = ['№1','№2','№3','№4','№5','№6'];
+const plotPh = [6.1,6.4,6.8,5.6,7.2,6.3];
+renderBarChart('phChart', plotLabels, plotPh, plotPh.map(v => v < 5.5 ? '#C7654B' : (v > 7.5 ? '#E8B84B' : '#2CA58D')), '');
+renderBarChart('npkChart', ['N','P','K'], [82,38,145], ['#E8B84B','#C7654B','#2CA58D'], '');
+</script>
+</body>
+</html>
